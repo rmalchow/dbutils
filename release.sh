@@ -15,7 +15,7 @@ realpath() {
 
 project_dir=`realpath $0`
 
-local_maven=${HOME}/maven-mcon
+local_maven=${HOME}/maven
 
 if [ ! -d ${local_maven} ]; then
 	mkdirs -p ${local_maven}
