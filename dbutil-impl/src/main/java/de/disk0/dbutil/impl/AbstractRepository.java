@@ -31,6 +31,7 @@ public abstract class AbstractRepository<T extends BaseEntity<S>,S> implements R
 	protected DataSource dataSource;
 
 	private String findOneStatement;
+	private String findAllStatement;
 	private String insertOneStatement;
 	private String updateOneStatement;
 	private String deleteOneStatement;
@@ -72,13 +73,21 @@ public abstract class AbstractRepository<T extends BaseEntity<S>,S> implements R
 	protected String getFindOneStatement() {
 		if(findOneStatement == null) {
 			ParsedEntity<T> pe = getParsedEntity();
-			List<String> columns = new ArrayList<>();
-			for(ParsedColumn pc : pe.getColumns()) {
-				columns.add("`"+pc.getColumnName()+"`");
-			}
-			findOneStatement = "SELECT "+(StringUtils.join(columns,","))+" FROM `"+pe.getTableName()+"` WHERE `"+pe.getIdColumn()+"` = :id";
+			findOneStatement = "SELECT * FROM `"+pe.getTableName()+"` WHERE `"+pe.getIdColumn()+"` = :id";
 		}
 		return findOneStatement; 
+	}
+	
+	protected List<T> findAll() throws SqlException {
+		return find(getFindAllStatement(), new HashMap<>());
+	}
+	
+	protected String getFindAllStatement() {
+		if(findAllStatement == null) {
+			ParsedEntity<T> pe = getParsedEntity();
+			findAllStatement = "SELECT * FROM `"+pe.getTableName();
+		}
+		return findAllStatement; 
 	}
 	
 	public T get(S id) throws SqlException {

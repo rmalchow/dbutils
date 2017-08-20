@@ -1,17 +1,8 @@
 package de.disk0.dbutil.impl;
 
-import java.lang.reflect.ParameterizedType;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import javax.sql.DataSource;
-
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.jdbc.core.RowMapper;
@@ -19,8 +10,6 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 import de.disk0.dbutil.api.entities.BaseGuidEntity;
 import de.disk0.dbutil.api.exceptions.SqlException;
-import de.disk0.dbutil.impl.util.ParsedEntity;
-import de.disk0.dbutil.impl.util.ParsedEntity.ParsedColumn;
 
 
 public abstract class AbstractGuidRepository<T extends BaseGuidEntity> extends AbstractRepository<T,String> implements RowMapper<T> {
