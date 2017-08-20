@@ -19,7 +19,7 @@ local_maven=${HOME}/maven
 
 if [ ! -d ${local_maven} ]; then
 	mkdirs -p ${local_maven}
-	git clone git@github.com:autonubil/maven.git ${local_maven}
+	git clone git@github.com:rmalchow/maven.git ${local_maven}
 fi
 
 cd ${local_maven}
