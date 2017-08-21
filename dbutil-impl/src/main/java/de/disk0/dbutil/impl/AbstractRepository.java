@@ -13,6 +13,7 @@ import javax.sql.DataSource;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
@@ -28,6 +29,7 @@ public abstract class AbstractRepository<T extends BaseEntity<S>,S> implements R
 	
 	private Class<T> clazz;
 	
+	@Autowired
 	protected DataSource dataSource;
 
 	private String findOneStatement;
@@ -37,7 +39,6 @@ public abstract class AbstractRepository<T extends BaseEntity<S>,S> implements R
 	private String deleteOneStatement;
 	
 	private ParsedEntity<T> parsedEntity;
-	
 	
 	public AbstractRepository() {
 	}
