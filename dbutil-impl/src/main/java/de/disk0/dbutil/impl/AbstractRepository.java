@@ -86,7 +86,7 @@ public abstract class AbstractRepository<T extends BaseEntity<S>,S> implements R
 	protected String getFindAllStatement() {
 		if(findAllStatement == null) {
 			ParsedEntity<T> pe = getParsedEntity();
-			findAllStatement = "SELECT * FROM `"+pe.getTableName();
+			findAllStatement = "SELECT * FROM `"+pe.getTableName()+"`";
 		}
 		return findAllStatement; 
 	}
