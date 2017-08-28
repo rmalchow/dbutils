@@ -18,6 +18,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 import de.disk0.dbutil.api.entities.BaseEntity;
+import de.disk0.dbutil.api.exceptions.NonUniqueResultException;
 import de.disk0.dbutil.api.exceptions.SqlException;
 import de.disk0.dbutil.impl.util.ParsedEntity;
 import de.disk0.dbutil.impl.util.ParsedEntity.ParsedColumn;
@@ -69,6 +70,17 @@ public abstract class AbstractRepository<T extends BaseEntity<S>,S> implements R
 		} catch (Exception e) {
 			throw new SqlException("SQL.REPO.LIST_FAILED",new Object[] { e.getMessage() },  e);
 		}
+	}
+	
+	protected T findOne(String sql, Map<String,Object> params) throws SqlException {
+		try {
+			List<T> out = find(sql, params);
+			if(out.size()==0) return null;
+			if(out.size()==1) return out.get(0);
+		} catch (Exception e) {
+			throw new SqlException("SQL.REPO.LIST_FAILED",new Object[] { e.getMessage() },  e);
+		}
+		throw new NonUniqueResultException();
 	}
 	
 	protected String getFindOneStatement() {
