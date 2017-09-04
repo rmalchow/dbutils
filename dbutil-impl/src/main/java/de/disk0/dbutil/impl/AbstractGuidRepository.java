@@ -1,11 +1,11 @@
 package de.disk0.dbutil.impl;
 
-import java.util.Map;
 import java.util.UUID;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 import de.disk0.dbutil.api.entities.BaseGuidEntity;
@@ -19,18 +19,20 @@ public abstract class AbstractGuidRepository<T extends BaseGuidEntity> extends A
 	public T save(T t) throws SqlException {
 		try {
 			beforeSave(t);
-			NamedParameterJdbcTemplate templ = new NamedParameterJdbcTemplate(dataSource);
+			NamedParameterJdbcTemplate templ = new NamedParameterJdbcTemplate(getDataSource());
 			if(t.getId()==null) {
 				t.setId(UUID.randomUUID().toString());
 				String sql = getInsertOneStatement();
-				Map<String,Object> params = unmap(t); 
+				
+				MapSqlParameterSource params = unmap(t);
+				
 				log.debug("saving entity: insert!");
 				log.debug("INSERT: "+sql);
 				log.debug("INSERT: "+params);
 				templ.update(sql, params);
 			} else {
 				String sql = getUpdateOneStatement();
-				Map<String,Object> params = unmap(t); 
+				MapSqlParameterSource params = unmap(t);
 				log.debug("saving entity: update!");
 				log.debug("UPDATE: "+sql);
 				log.debug("UPDATE: "+params);

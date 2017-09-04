@@ -15,6 +15,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 import de.disk0.dbutil.api.entities.BaseEntity;
@@ -63,7 +64,7 @@ public abstract class AbstractRepository<T extends BaseEntity<S>,S> implements R
 		try {
 			log.debug(sql);
 			log.debug(params);
-			NamedParameterJdbcTemplate t = new NamedParameterJdbcTemplate(dataSource);
+			NamedParameterJdbcTemplate t = new NamedParameterJdbcTemplate(getDataSource());
 			List<T> out = t.query(sql, params, this);
 			log.debug("-------- found: "+out.size());
 			return out;
@@ -105,7 +106,7 @@ public abstract class AbstractRepository<T extends BaseEntity<S>,S> implements R
 	
 	public T get(S id) throws SqlException {
 		try {
-			NamedParameterJdbcTemplate t = new NamedParameterJdbcTemplate(dataSource);
+			NamedParameterJdbcTemplate t = new NamedParameterJdbcTemplate(getDataSource());
 			Map<String,Object> params = new HashMap<>();
 			params.put("id", id);
 			List<T> ts = t.query(getFindOneStatement(), params, this);
@@ -175,7 +176,7 @@ public abstract class AbstractRepository<T extends BaseEntity<S>,S> implements R
 	
 	public void delete(String sql, Map<String,Object> params) throws SqlException {
 		try {
-			NamedParameterJdbcTemplate templ = new NamedParameterJdbcTemplate(dataSource);
+			NamedParameterJdbcTemplate templ = new NamedParameterJdbcTemplate(getDataSource());
 			templ.update(sql, params);
 		} catch (Exception e) {
 			throw new SqlException("SQL.REPO.DELETE_FAILED",new Object[] { e.getMessage() },  e);
@@ -190,7 +191,7 @@ public abstract class AbstractRepository<T extends BaseEntity<S>,S> implements R
 				return;
 			}
 			beforeDelete(t);
-			NamedParameterJdbcTemplate templ = new NamedParameterJdbcTemplate(dataSource);
+			NamedParameterJdbcTemplate templ = new NamedParameterJdbcTemplate(getDataSource());
 			Map<String,Object> params = new HashMap<>();
 			params.put("id", t.getId());
 			sql = getDeleteOneStatement();
@@ -203,12 +204,12 @@ public abstract class AbstractRepository<T extends BaseEntity<S>,S> implements R
 	}
 	
 	@SuppressWarnings("rawtypes")
-	protected HashMap<String, Object> unmap(T t) throws IllegalArgumentException, IllegalAccessException {
-		HashMap<String, Object> out = new HashMap<>();
+	protected MapSqlParameterSource unmap(T t) throws IllegalArgumentException, IllegalAccessException {
+		MapSqlParameterSource out = new MapSqlParameterSource();
 		for(ParsedColumn pc : getParsedEntity().getColumns()) {
 			log.debug("unmapping ---> "+pc.getColumnName());
 			Object o = pc.get(t);
-			out.put(pc.getColumnName(), o==null?java.sql.Types.NULL:o);
+			out.addValue(pc.getColumnName(),o);
 		}
 		return out;
 	}
@@ -229,6 +230,14 @@ public abstract class AbstractRepository<T extends BaseEntity<S>,S> implements R
 		} catch (Exception e) {
 			throw new SQLException("failed to map and entity ("+e.getMessage()+")",e);
 		}
+	}
+
+	public DataSource getDataSource() {
+		return dataSource;
+	}
+
+	public void setDataSource(DataSource dataSource) {
+		this.dataSource = dataSource;
 	}	
 	
 }
