@@ -65,6 +65,7 @@ public abstract class AbstractRepository<T extends BaseEntity<S>,S> implements R
 			log.debug(sql);
 			log.debug(params);
 			NamedParameterJdbcTemplate t = new NamedParameterJdbcTemplate(getDataSource());
+			log.debug("-------- query: "+sql+" / "+params);
 			List<T> out = t.query(sql, params, this);
 			log.debug("-------- found: "+out.size());
 			return out;
@@ -177,6 +178,7 @@ public abstract class AbstractRepository<T extends BaseEntity<S>,S> implements R
 	public void delete(String sql, Map<String,Object> params) throws SqlException {
 		try {
 			NamedParameterJdbcTemplate templ = new NamedParameterJdbcTemplate(getDataSource());
+			log.debug("-------- update: "+sql+" / "+params);
 			templ.update(sql, params);
 		} catch (Exception e) {
 			throw new SqlException("SQL.REPO.DELETE_FAILED",new Object[] { e.getMessage() },  e);
