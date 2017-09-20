@@ -16,6 +16,11 @@ public abstract class AbstractGuidRepository<T extends BaseGuidEntity> extends A
 
 	private static Log log = LogFactory.getLog(AbstractGuidRepository.class);
 	
+	public void delete(String id) throws SqlException {
+		T t = get(id);
+		super.delete(t);
+	}
+	
 	public T save(T t) throws SqlException {
 		try {
 			beforeSave(t);

@@ -62,14 +62,14 @@ public abstract class AbstractRepository<T extends BaseEntity<S>,S> implements R
 	
 	protected List<T> find(String sql, Map<String,Object> params) throws SqlException {
 		try {
-			log.debug(sql);
-			log.debug(params);
 			NamedParameterJdbcTemplate t = new NamedParameterJdbcTemplate(getDataSource());
+			long start = System.currentTimeMillis();
 			log.debug("-------- query: "+sql+" / "+params);
 			List<T> out = t.query(sql, params, this);
-			log.debug("-------- found: "+out.size());
+			log.debug("-------- found: "+out.size()+" / "+(System.currentTimeMillis()-start)+"ms");
 			return out;
 		} catch (Exception e) {
+			log.warn("-------- query failed: "+sql+" / "+params);
 			throw new SqlException("SQL.REPO.LIST_FAILED",new Object[] { e.getMessage() },  e);
 		}
 	}
@@ -80,6 +80,7 @@ public abstract class AbstractRepository<T extends BaseEntity<S>,S> implements R
 			if(out.size()==0) return null;
 			if(out.size()==1) return out.get(0);
 		} catch (Exception e) {
+			log.warn("-------- query failed: "+sql+" / "+params);
 			throw new SqlException("SQL.REPO.LIST_FAILED",new Object[] { e.getMessage() },  e);
 		}
 		throw new NonUniqueResultException();
@@ -106,9 +107,10 @@ public abstract class AbstractRepository<T extends BaseEntity<S>,S> implements R
 	}
 	
 	public T get(S id) throws SqlException {
+		Map<String,Object> params = new HashMap<>();
+		String sql = getFindOneStatement();
 		try {
 			NamedParameterJdbcTemplate t = new NamedParameterJdbcTemplate(getDataSource());
-			Map<String,Object> params = new HashMap<>();
 			params.put("id", id);
 			List<T> ts = t.query(getFindOneStatement(), params, this);
 			if(ts.size()>0) {
@@ -116,6 +118,7 @@ public abstract class AbstractRepository<T extends BaseEntity<S>,S> implements R
 			}
 			return null;
 		} catch (Exception e) {
+			log.warn("-------- query failed: "+sql+" / "+params);
 			throw new SqlException("SQL.REPO.LIST_FAILED",new Object[] { e.getMessage() },  e);
 		}
 	}
@@ -169,18 +172,13 @@ public abstract class AbstractRepository<T extends BaseEntity<S>,S> implements R
 	protected void afterDelete(T t) throws Exception {
 	}
 	
-
-	
-	public void delete(S id) throws SqlException {
-		delete(get(id));
-	}
-	
 	public void delete(String sql, Map<String,Object> params) throws SqlException {
 		try {
 			NamedParameterJdbcTemplate templ = new NamedParameterJdbcTemplate(getDataSource());
 			log.debug("-------- update: "+sql+" / "+params);
 			templ.update(sql, params);
 		} catch (Exception e) {
+			log.warn("-------- delete failed: "+sql+" / "+params);
 			throw new SqlException("SQL.REPO.DELETE_FAILED",new Object[] { e.getMessage() },  e);
 		}
 	}
@@ -209,7 +207,6 @@ public abstract class AbstractRepository<T extends BaseEntity<S>,S> implements R
 	protected MapSqlParameterSource unmap(T t) throws IllegalArgumentException, IllegalAccessException {
 		MapSqlParameterSource out = new MapSqlParameterSource();
 		for(ParsedColumn pc : getParsedEntity().getColumns()) {
-			log.debug("unmapping ---> "+pc.getColumnName());
 			Object o = pc.get(t);
 			out.addValue(pc.getColumnName(),o);
 		}
@@ -221,7 +218,6 @@ public abstract class AbstractRepository<T extends BaseEntity<S>,S> implements R
 		try {
 			T out = getClazz().newInstance();
 			for(ParsedColumn pc : getParsedEntity().getColumns()) {
-				log.debug("mapping ---> "+pc.getColumnName());
 				try {
 					pc.set(out, rs.getObject(pc.getColumnName()));
 				} catch (Exception e) {
