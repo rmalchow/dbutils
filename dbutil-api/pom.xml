@@ -3,7 +3,7 @@
   <parent>
     <groupId>de.disk0.dbutil</groupId>
     <artifactId>dbutil</artifactId>
-    <version>0.0.10-SNAPSHOT</version>
+    <version>0.0.11-SNAPSHOT</version>
   </parent>
   <artifactId>dbutil-api</artifactId>
 </project>
