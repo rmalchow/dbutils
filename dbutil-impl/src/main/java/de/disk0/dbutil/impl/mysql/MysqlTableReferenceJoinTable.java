@@ -9,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import de.disk0.dbutil.api.Comparator;
 import de.disk0.dbutil.api.Condition;
+import de.disk0.dbutil.api.Field;
 import de.disk0.dbutil.api.JoinTable;
 import de.disk0.dbutil.api.Operator;
 import de.disk0.dbutil.api.TableReference;
@@ -78,17 +79,24 @@ public class MysqlTableReferenceJoinTable extends MysqlTableReferenceSimple impl
 	
 	@Override
 	public Condition addOn(Operator op, TableReference table1, String field1, Comparator c, TableReference table2, String field2) {
-		if(condition==null) {
-			condition = new MysqlCondition(this.aliasGenerator);
-		}
-		return condition.condition(op, table1, field1, c, table2, field2);
+		Field left = table1.field(field1);
+		Field right = table2.field(field2);
+		return this.addOn(op, left, c, right);
 	}
 
 	@Override
 	public Condition addOn(Operator op, TableReference table1, String field1, Comparator c, Object value) {
+		Field left = table1.field(field1);
+		Field right = table1.value(value);
+		return this.addOn(op, left, c, right);
+	}
+	
+	@Override
+	public Condition addOn(Operator op, Field left, Comparator c, Field right) {
 		if(condition==null) {
 			condition = new MysqlCondition(this.aliasGenerator);
 		}
-		return condition.condition(op, table1, field1, c, value);
+		return condition.condition(op, left,c, right);
 	}
+	
 }

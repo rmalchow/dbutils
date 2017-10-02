@@ -9,7 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import de.disk0.dbutil.api.Comparator;
 import de.disk0.dbutil.api.Condition;
-import de.disk0.dbutil.api.FieldReference;
+import de.disk0.dbutil.api.Field;
 import de.disk0.dbutil.api.Operator;
 import de.disk0.dbutil.api.TableReference;
 import de.disk0.dbutil.impl.util.AliasGenerator;
@@ -18,8 +18,8 @@ public class MysqlCondition implements Condition {
 
 
 	private Operator op;
-	private FieldReference leftField;
-	private FieldReference rightField;
+	private Field leftField;
+	private Field rightField;
 	private Comparator c;
 	
 	private List<MysqlCondition> conditions = new ArrayList<>();
@@ -31,20 +31,20 @@ public class MysqlCondition implements Condition {
 
 	public MysqlCondition(AliasGenerator aliasGenerator, Operator op, TableReference table1, String field1, Comparator c, Object value) {
 		this.op = op;
-		FieldReference left = new MysqlField(table1,field1);
-		FieldReference right = new MysqlField(aliasGenerator,value);
+		Field left = new MysqlField(table1,field1);
+		Field right = new MysqlField(aliasGenerator,value);
 		this.conditions.add(new MysqlCondition(aliasGenerator, op, left, c, right));
 	}
 
 	public MysqlCondition(AliasGenerator aliasGenerator, Operator op, TableReference table1, String field1, Comparator c, TableReference table2, String field2) {
 		this.aliasGenerator = aliasGenerator;
 		this.op = op;
-		FieldReference left = new MysqlField(table1,field1);
-		FieldReference right = new MysqlField(table2,field2);
+		Field left = new MysqlField(table1,field1);
+		Field right = new MysqlField(table2,field2);
 		this.conditions.add(new MysqlCondition(aliasGenerator, op, left, c, right));
 	}
 	
-	public MysqlCondition(AliasGenerator aliasGenerator, Operator op, FieldReference fr1, Comparator c, FieldReference fr2) {
+	public MysqlCondition(AliasGenerator aliasGenerator, Operator op, Field fr1, Comparator c, Field fr2) {
 		this.aliasGenerator = aliasGenerator;
 		this.leftField = fr1;
 		this.rightField = fr2;
@@ -71,7 +71,7 @@ public class MysqlCondition implements Condition {
 	}
 
 	@Override
-	public Condition condition(Operator op, FieldReference left, Comparator c, FieldReference right) {
+	public Condition condition(Operator op, Field left, Comparator c, Field right) {
 		if(leftField!=null) {
 			MysqlCondition cE = new MysqlCondition(this.aliasGenerator, this.op, this.leftField, this.c, this.rightField);
 			this.conditions.add(cE);
@@ -83,25 +83,25 @@ public class MysqlCondition implements Condition {
 
 	@Override
 	public Condition condition(Operator op, TableReference table1, String field1, Comparator c, Object value) {
-		FieldReference left = new MysqlField(table1, field1);
-		FieldReference right = new MysqlField(aliasGenerator, value);
+		Field left = table1.field(field1);
+		Field right = table1.value(value);
 		return this.condition(op, left, c, right);
 	}
 	
 	@Override
 	public Condition condition(Operator op, TableReference table1, String field1, Comparator c, TableReference table2, String field2) {
-		FieldReference left = new MysqlField(table1, field1);
-		FieldReference right = new MysqlField(table2, field2);
+		Field left = table1.field(field1);
+		Field right = table2.value(field2);
 		return this.condition(op, left, c, right);
 	}
 
 	@Override
-	public Condition isNotNull(Operator op, FieldReference left) {
+	public Condition isNotNull(Operator op, Field left) {
 		return this.condition(op, left, Comparator.NOT_NULL, null);
 	}
 	
 	@Override
-	public Condition isNull(Operator op, FieldReference left) {
+	public Condition isNull(Operator op, Field left) {
 		return this.condition(op, left, Comparator.NULL, null);
 	}
 	

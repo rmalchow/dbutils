@@ -8,7 +8,7 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 
 import de.disk0.dbutil.api.Aggregate;
-import de.disk0.dbutil.api.FieldReference;
+import de.disk0.dbutil.api.Field;
 import de.disk0.dbutil.api.JoinTable;
 import de.disk0.dbutil.api.TableReference;
 import de.disk0.dbutil.impl.util.AliasGenerator;
@@ -95,17 +95,17 @@ public class MysqlTableReferenceSimple implements TableReference {
 	}
 
 	@Override
-	public FieldReference field(String fieldname) {
+	public Field field(String fieldname) {
 		return new MysqlField(this, fieldname);
 	}
 
 	@Override
-	public FieldReference value(Object value) {
+	public Field value(Object value) {
 		return new MysqlField(aliasGenerator,value);
 	}
 
 	@Override
-	public FieldReference field(Aggregate a, FieldReference... references) {
+	public Field field(Aggregate a, Field... references) {
 		return new MysqlField(a, references);
 	}
 	

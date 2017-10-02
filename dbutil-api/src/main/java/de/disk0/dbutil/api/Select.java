@@ -4,24 +4,36 @@ import java.util.Map;
 
 public interface Select {
 
-	public FieldReference addSelect(Object value, String alias);
-	public FieldReference addSelect(TableReference tableReference, String field, String alias);
-	public FieldReference addSelect(Aggregate a, TableReference tableReference, String field, String alias);
-	public FieldReference addSelect(Aggregate a, String alias, FieldReference... references);
-	public FieldReference addSelect(FieldReference fr, String alias);
+	@Deprecated
+	public Field addSelect(Object value, String alias);
+	@Deprecated
+	public Field addSelect(TableReference tableReference, String field, String alias);
+	@Deprecated
+	public Field addSelect(Aggregate a, TableReference tableReference, String field, String alias);
+	public Field addSelect(Aggregate a, String alias, Field... references);
+	public Field addSelect(Field fr, String alias);
 
 	public TableReference fromTable(String table);
 	public SubSelect from();
 
+	@Deprecated
 	public Condition condition(Operator op, TableReference table1, String field1, Comparator c, TableReference table2, String field2);
+	@Deprecated
 	public Condition condition(Operator op, TableReference table1, String field1, Comparator c, Object value);
-	public Condition condition(Operator op, FieldReference fr1, Comparator c, FieldReference fr2);
-	public Condition isNull(Operator op, FieldReference fr1);
-	public Condition isNotNull(Operator op, FieldReference fr1);
+
+	public Condition condition(Operator op, Field fr1, Comparator c, Field fr2);
+	public Condition isNull(Operator op, Field fr1);
+	public Condition isNotNull(Operator op, Field fr1);
 
 	public void limit(int offset, int max);
-	public void order(TableReference table, String field, boolean ascending);
+
+	@Deprecated
 	public void group(TableReference table, String field);
+	@Deprecated
+	public void order(TableReference table, String field, boolean ascending);
+
+	public void group(Field reference);
+	public void order(Field reference, boolean ascending);
 
 	public String getSql();
 	

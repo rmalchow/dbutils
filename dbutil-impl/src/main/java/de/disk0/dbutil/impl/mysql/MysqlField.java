@@ -8,23 +8,23 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 
 import de.disk0.dbutil.api.Aggregate;
-import de.disk0.dbutil.api.FieldReference;
+import de.disk0.dbutil.api.Field;
 import de.disk0.dbutil.api.TableReference;
 import de.disk0.dbutil.impl.util.AliasGenerator;
 
-public class MysqlField implements FieldReference {
+public class MysqlField implements Field {
 
 	private Aggregate aggregate;
-	private List<FieldReference> fields = new ArrayList<>();
+	private List<Field> fields = new ArrayList<>();
 	private Map<String,Object> params = new HashMap<>();
 	private String table;
 	private String field;
 	private String valueAlias;
 	private String alias;
 	
-	public MysqlField(Aggregate aggregate, FieldReference... references) {
+	public MysqlField(Aggregate aggregate, Field... references) {
 		this.aggregate = aggregate;
-		for(FieldReference f : references) {
+		for(Field f : references) {
 			fields.add(f);
 			params.putAll(f.getParams());
 		}
@@ -40,7 +40,7 @@ public class MysqlField implements FieldReference {
 		this.field = field;
 	}
 	
-	public MysqlField(FieldReference fr, String alias) {
+	public MysqlField(Field fr, String alias) {
 		fields.add(fr);
 		this.alias = alias;
 	}
@@ -54,7 +54,7 @@ public class MysqlField implements FieldReference {
 		} else if(valueAlias!=null) {
 			parts.add(":"+valueAlias);
 		} else {
-			for(FieldReference f : fields) {
+			for(Field f : fields) {
 				parts.add(f.getSql());
 			}
 		}

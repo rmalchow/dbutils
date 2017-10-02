@@ -60,7 +60,7 @@ public abstract class AbstractRepository<T extends BaseEntity<S>,S> implements R
 		return parsedEntity;
 	}
 	
-	protected List<T> find(String sql, Map<String,Object> params) throws SqlException {
+	public List<T> find(String sql, Map<String,Object> params) throws SqlException {
 		try {
 			NamedParameterJdbcTemplate t = new NamedParameterJdbcTemplate(getDataSource());
 			long start = System.currentTimeMillis();
