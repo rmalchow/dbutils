@@ -107,8 +107,4 @@ public class MysqlTableReferenceJoinTable extends MysqlTableReferenceSimple impl
 		return condition.condition(op);
 	}
 	
-}	
-	
-	
-	
 }
