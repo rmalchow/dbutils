@@ -99,4 +99,16 @@ public class MysqlTableReferenceJoinTable extends MysqlTableReferenceSimple impl
 		return condition.condition(op, left,c, right);
 	}
 	
+	@Override
+	public Condition addOn(Operator op) {
+		if(condition==null) {
+			condition = new MysqlCondition(this.aliasGenerator);
+		}
+		return condition.condition(op);
+	}
+	
+}	
+	
+	
+	
 }
