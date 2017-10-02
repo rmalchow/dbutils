@@ -16,4 +16,8 @@ public interface TableReference {
 	
 	public JoinTable join(String table);
 
+	public FieldReference field(String fieldname);
+	public FieldReference value(Object value);
+	public FieldReference field(Aggregate a, FieldReference... fr);
+	
 }

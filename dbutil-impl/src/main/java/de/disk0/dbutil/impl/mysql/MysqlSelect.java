@@ -10,16 +10,16 @@ import org.apache.commons.lang3.StringUtils;
 import de.disk0.dbutil.api.Aggregate;
 import de.disk0.dbutil.api.Comparator;
 import de.disk0.dbutil.api.Condition;
+import de.disk0.dbutil.api.FieldReference;
 import de.disk0.dbutil.api.Operator;
 import de.disk0.dbutil.api.Select;
-import de.disk0.dbutil.api.SelectExpression;
 import de.disk0.dbutil.api.SubSelect;
 import de.disk0.dbutil.api.TableReference;
 import de.disk0.dbutil.impl.util.AliasGenerator;
 
 public class MysqlSelect implements Select {
 
-	private List<SelectExpression> se = new ArrayList<>();
+	private List<FieldReference> se = new ArrayList<>();
 	private List<TableReference> tr = new ArrayList<>();
 	private Condition wc;
 	private List<String> order = new ArrayList<>();
@@ -38,26 +38,52 @@ public class MysqlSelect implements Select {
 		this.aliasGenerator = aliasGenerator;
 	}
 	
+	
+	
 	@Override
-	public SelectExpression addSelect(Aggregate aggregate, TableReference tableReference, String field, String alias) {
+	public FieldReference addSelect(Aggregate aggregate, TableReference tableReference, String field, String alias) {
 		if(alias == null) {
 			alias = field;
 		}
-		SelectExpression s = new MysqlSelectExpression(aggregate, tableReference.getAlias(),field, alias);
-		se.add(s);
-		return s;
+		FieldReference f1 = new MysqlField(tableReference,field); 
+		FieldReference f2 = new MysqlField(aggregate,f1); 
+		FieldReference f3 = new MysqlField(f2,alias); 
+		se.add(f3);
+		return f3;
 	}
 
 	@Override
-	public SelectExpression addSelect(TableReference tableReference, String field, String alias) {
-		return addSelect(null, tableReference, field, alias);
+	public FieldReference addSelect(TableReference tableReference, String field, String alias) {
+		if(alias == null) {
+			alias = field;
+		}
+		FieldReference f1 = new MysqlField(tableReference,field); 
+		FieldReference f2 = new MysqlField(f1,alias); 
+		se.add(f2);
+		return f2;
 	}
 
 	@Override
-	public SelectExpression addSelect(Object value, String alias) {
-		SelectExpression s = new MysqlSelectExpression(aliasGenerator, value, alias);
-		se.add(s);
-		return s;
+	public FieldReference addSelect(Aggregate a, String alias, FieldReference... references) {
+		FieldReference f1 = new MysqlField(a, references); 
+		FieldReference f2 = new MysqlField(f1,alias); 
+		se.add(f2);
+		return f2;
+	}
+	
+	@Override
+	public FieldReference addSelect(FieldReference fr, String alias) {
+		FieldReference f2 = new MysqlField(fr,alias); 
+		se.add(f2);
+		return f2;
+	}
+	
+	@Override
+	public FieldReference addSelect(Object value, String alias) {
+		FieldReference f1 = new MysqlField(aliasGenerator,value); 
+		FieldReference f2 = new MysqlField(f1,alias); 
+		se.add(f2);
+		return f2;
 	}
 	
 	@Override
@@ -75,21 +101,37 @@ public class MysqlSelect implements Select {
 	}
 
 	@Override
-	public Condition condition(Operator op, TableReference table1, String field1, Comparator c, TableReference table2, String field2) {
+	public Condition condition(Operator op, FieldReference left, Comparator c, FieldReference right) {
 		if(wc==null) {
-			wc = new MysqlCondition(this.aliasGenerator);
+			wc = new MysqlCondition(aliasGenerator);
 		}
-		return wc.condition(op, table1, field1, c, table2, field2);
+		return wc.condition(op, left, c, right);
+	}
+	@Override
+	public Condition condition(Operator op, TableReference table1, String field1, Comparator c, Object value) {
+		FieldReference left = new MysqlField(table1, field1);
+		FieldReference right = new MysqlField(aliasGenerator, value);
+		return this.condition(op, left, c, right);
+	}
+	
+	@Override
+	public Condition condition(Operator op, TableReference table1, String field1, Comparator c, TableReference table2, String field2) {
+		FieldReference left = new MysqlField(table1, field1);
+		FieldReference right = new MysqlField(table2, field2);
+		return this.condition(op, left, c, right);
 	}
 
 	@Override
-	public Condition condition(Operator op, TableReference table1, String field1, Comparator c, Object value) {
-		if(wc==null) {
-			wc = new MysqlCondition(this.aliasGenerator);
-		}
-		return wc.condition(op, table1, field1, c, value);
+	public Condition isNotNull(Operator op, FieldReference left) {
+		return this.condition(op, left, Comparator.NOT_NULL, null);
 	}
-
+	
+	@Override
+	public Condition isNull(Operator op, FieldReference left) {
+		return this.condition(op, left, Comparator.NULL, null);
+	}
+	
+	
 	@Override
 	public String getSql() {
 		StringBuilder sb = new StringBuilder();
@@ -98,7 +140,7 @@ public class MysqlSelect implements Select {
 			sb.append("*");
 		} else {
 			List<String> seSql = new ArrayList<>();
-			for(SelectExpression s : se) {
+			for(FieldReference s : se) {
 				seSql.add(s.getSql());
 			}
 			sb.append(StringUtils.join(seSql.toArray(),", "));
@@ -170,7 +212,7 @@ public class MysqlSelect implements Select {
 	@Override
 	public Map<String, Object> getParams() {
 		Map<String, Object> out = new HashMap<>();
-		for(SelectExpression se : se) {
+		for(FieldReference se : se) {
 			out.putAll(se.getParams());
 		}
 		for(TableReference t : tr) {

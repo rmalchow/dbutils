@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import de.disk0.dbutil.api.Aggregate;
 import de.disk0.dbutil.api.Comparator;
 import de.disk0.dbutil.api.Condition;
+import de.disk0.dbutil.api.FieldReference;
 import de.disk0.dbutil.api.Operator;
 import de.disk0.dbutil.api.Select;
 import de.disk0.dbutil.api.SelectExpression;
@@ -76,18 +77,29 @@ public class MysqlTableReferenceSubSelect extends MysqlTableReferenceSimple impl
 		return table;
 	}
 	
-	public SelectExpression addSelect(TableReference tableReference, String field, String alias) {
+	public FieldReference addSelect(TableReference tableReference, String field, String alias) {
 		return addSelect(null,tableReference, field, alias);
 	}
 
-	public SelectExpression addSelect(Object value, String alias) {
+	public FieldReference addSelect(Object value, String alias) {
 		return addSelect(value,alias);
 	}
 
-	public SelectExpression addSelect(Aggregate a, TableReference tableReference, String field, String alias) {
+	public FieldReference addSelect(Aggregate a, TableReference tableReference, String field, String alias) {
 		return select.addSelect(a, tableReference, field, alias);
 	}
 
+	@Override
+	public FieldReference addSelect(FieldReference fr, String alias) {
+		return select.addSelect(fr, alias);
+	}
+
+	@Override
+	public FieldReference addSelect(Aggregate a, String alias, FieldReference... references) {
+		return select.addSelect(a, alias, references);
+	}
+	
+	
 	public TableReference fromTable(String table) {
 		return select.fromTable(table);
 	}
@@ -105,6 +117,17 @@ public class MysqlTableReferenceSubSelect extends MysqlTableReferenceSimple impl
 		return select.condition(op, table1, field1, c, value);
 	}
 	
+	public Condition condition(Operator op, FieldReference fr1, Comparator c, FieldReference fr2) {
+		return select.condition(op, fr1, c, fr2);
+	}
+
+	public Condition isNull(Operator op, FieldReference fr1) {
+		return select.isNull(op, fr1);
+	}
+
+	public Condition isNotNull(Operator op, FieldReference fr1) {
+		return select.isNotNull(op, fr1);
+	}
 
 	public void limit(int offset, int max) {
 		select.limit(offset, max);
