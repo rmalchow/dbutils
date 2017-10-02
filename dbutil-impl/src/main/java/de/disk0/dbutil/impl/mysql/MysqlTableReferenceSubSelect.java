@@ -116,15 +116,23 @@ public class MysqlTableReferenceSubSelect extends MysqlTableReferenceSimple impl
 	public Condition condition(Operator op, TableReference table1, String field1, Comparator c, Object value) {
 		return select.condition(op, table1, field1, c, value);
 	}
+
+	@Override
+	public Condition condition(Operator op) {
+		return select.condition(op);
+	}
 	
+	@Override
 	public Condition condition(Operator op, Field fr1, Comparator c, Field fr2) {
 		return select.condition(op, fr1, c, fr2);
 	}
 
+	@Override
 	public Condition isNull(Operator op, Field fr1) {
 		return select.isNull(op, fr1);
 	}
 
+	@Override
 	public Condition isNotNull(Operator op, Field fr1) {
 		return select.isNotNull(op, fr1);
 	}

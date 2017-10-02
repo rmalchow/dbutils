@@ -102,12 +102,21 @@ public class MysqlSelect implements Select {
 	}
 
 	@Override
+	public Condition condition(Operator op) {
+		if(wc==null) {
+			wc = new MysqlCondition(aliasGenerator);
+		}
+		return wc.condition(op);
+	}
+
+	@Override
 	public Condition condition(Operator op, Field left, Comparator c, Field right) {
 		if(wc==null) {
 			wc = new MysqlCondition(aliasGenerator);
 		}
 		return wc.condition(op, left, c, right);
 	}
+
 	@Override
 	public Condition condition(Operator op, TableReference table1, String field1, Comparator c, Object value) {
 		Field left = new MysqlField(table1, field1);
@@ -157,8 +166,11 @@ public class MysqlSelect implements Select {
 		parts.add(join(tr, ", "));
 
 		if(wc!=null) {
-			parts.add("WHERE");
-			parts.add(wc.getSql());
+			String where = wc.getSql(); 
+			if(where.length()>0) {
+				parts.add("WHERE");
+				parts.add(where);
+			}
 		}
 
 		if(group.size()>0) {

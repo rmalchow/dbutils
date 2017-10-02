@@ -21,6 +21,7 @@ public interface Select {
 	@Deprecated
 	public Condition condition(Operator op, TableReference table1, String field1, Comparator c, Object value);
 
+	public Condition condition(Operator op);
 	public Condition condition(Operator op, Field fr1, Comparator c, Field fr2);
 	public Condition isNull(Operator op, Field fr1);
 	public Condition isNotNull(Operator op, Field fr1);

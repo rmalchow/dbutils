@@ -22,13 +22,18 @@ public class MysqlCondition implements Condition {
 	private Field rightField;
 	private Comparator c;
 	
-	private List<MysqlCondition> conditions = new ArrayList<>();
+	private List<Condition> conditions = new ArrayList<>();
 	private AliasGenerator aliasGenerator;
 	
 	public MysqlCondition(AliasGenerator aliasGenerator) {
 		this.aliasGenerator = aliasGenerator;
 	}
 
+	public MysqlCondition(AliasGenerator aliasGenerator, Operator op) {
+		this.aliasGenerator = aliasGenerator;
+		this.op = op;
+	}
+	
 	public MysqlCondition(AliasGenerator aliasGenerator, Operator op, TableReference table1, String field1, Comparator c, Object value) {
 		this.op = op;
 		Field left = new MysqlField(table1,field1);
@@ -54,7 +59,7 @@ public class MysqlCondition implements Condition {
 	
 	public Map<String,Object> getParams() {
 		Map<String,Object> out = new HashMap<>();
-		for(MysqlCondition mc : conditions) {
+		for(Condition mc : conditions) {
 			out.putAll(mc.getParams());
 		}
 		if(leftField!=null) out.putAll(leftField.getParams());
@@ -70,15 +75,25 @@ public class MysqlCondition implements Condition {
 		this.op = op;
 	}
 
-	@Override
-	public Condition condition(Operator op, Field left, Comparator c, Field right) {
+	private Condition addCondition(Condition c) {
 		if(leftField!=null) {
 			MysqlCondition cE = new MysqlCondition(this.aliasGenerator, this.op, this.leftField, this.c, this.rightField);
 			this.conditions.add(cE);
+			leftField = null;
 		}
-		MysqlCondition cN = new MysqlCondition(this.aliasGenerator, op, left, c, right);
-		this.conditions.add(cN);
-		return cN;
+		this.conditions.add(c);
+		return c;
+	}
+	
+	@Override
+	public Condition condition(Operator op) {
+		return addCondition(new MysqlCondition(aliasGenerator,op));
+	}
+	
+	
+	@Override
+	public Condition condition(Operator op, Field left, Comparator c, Field right) {
+		return addCondition(new MysqlCondition(aliasGenerator,op,left,c,right));
 	}
 
 	@Override
@@ -109,30 +124,32 @@ public class MysqlCondition implements Condition {
 	public String getSql() {
 		List<String> parts = new ArrayList<>();
 		
-		if(leftField!=null) {
-			
-		}
 		if(conditions.size()>0) {
 
-			if(conditions.size()==1) {
-				return conditions.get(0).getSql();
-			}
+			System.err.println(" some conditions, checking those .... ");
 			
-			List<MysqlCondition> cs = new ArrayList<>(conditions);
-			parts.add(cs.remove(0).getSql());
+			List<Condition> cs = new ArrayList<>(conditions);
 			
 			while(cs.size()>0) {
-				MysqlCondition c = cs.remove(0); 
-				parts.add(c.getOp().name());
+				Condition c = cs.remove(0);
+				if(c.getOp()==null || c.getSql().length()==0) {
+					System.err.println("op is null, continue .... ");
+					continue;
+				}
+				if(parts.size()>0) {
+					parts.add(c.getOp().name());
+				}
 				parts.add(c.getSql());
 			}
+
+			if(parts.size()>1) {
+				System.err.println(" some conditions, checking those .... more than 1 part, need parnetheses ... ");
+				return "("+StringUtils.join(parts," ")+")";
+			}
 			
-			return "("+StringUtils.join(parts," ")+")";
-			
-		} else {
+		} else if(leftField!=null) {
 			
 			parts.add(leftField.getSql());
-
 			parts.add(c.getSymbol());
 			
 			if(c == Comparator.NOT_NULL) {
@@ -147,7 +164,11 @@ public class MysqlCondition implements Condition {
 			
 			
 		}
-		return StringUtils.join(parts," ");
+		
+		String s = StringUtils.join(parts," "); 
+		System.err.println("returning: "+s);
+
+		return s;
 
 	}
 	
