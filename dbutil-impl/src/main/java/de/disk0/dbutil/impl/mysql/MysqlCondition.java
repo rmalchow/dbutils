@@ -125,15 +125,12 @@ public class MysqlCondition implements Condition {
 		List<String> parts = new ArrayList<>();
 		
 		if(conditions.size()>0) {
-
-			System.err.println(" some conditions, checking those .... ");
 			
 			List<Condition> cs = new ArrayList<>(conditions);
 			
 			while(cs.size()>0) {
 				Condition c = cs.remove(0);
 				if(c.getOp()==null || c.getSql().length()==0) {
-					System.err.println("op is null, continue .... ");
 					continue;
 				}
 				if(parts.size()>0) {
@@ -143,7 +140,6 @@ public class MysqlCondition implements Condition {
 			}
 
 			if(parts.size()>1) {
-				System.err.println(" some conditions, checking those .... more than 1 part, need parnetheses ... ");
 				return "("+StringUtils.join(parts," ")+")";
 			}
 			

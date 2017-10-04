@@ -87,14 +87,8 @@ public class MysqlField implements Field {
 			parts2.add(alias);
 			
 		}
-		
-		String x = StringUtils.join(parts2," "); 
-		
-		
-		
-		System.err.println(x);
-		
-		return x;
+
+		return StringUtils.join(parts2," ");
 		
 	}
 	

@@ -4,11 +4,11 @@ import java.util.Map;
 
 public interface Select {
 
-	@Deprecated
+	//@Deprecated
 	public Field addSelect(Object value, String alias);
-	@Deprecated
+	//@Deprecated
 	public Field addSelect(TableReference tableReference, String field, String alias);
-	@Deprecated
+	//@Deprecated
 	public Field addSelect(Aggregate a, TableReference tableReference, String field, String alias);
 	public Field addSelect(Aggregate a, String alias, Field... references);
 	public Field addSelect(Field fr, String alias);
