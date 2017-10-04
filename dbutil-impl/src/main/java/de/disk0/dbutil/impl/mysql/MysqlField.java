@@ -84,7 +84,7 @@ public class MysqlField implements Field {
 
 		if(alias!=null) {
 			parts2.add("AS");
-			parts2.add(alias);
+			parts2.add("`"+alias+"`");
 			
 		}
 

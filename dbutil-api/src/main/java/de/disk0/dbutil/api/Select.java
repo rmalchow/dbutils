@@ -16,9 +16,9 @@ public interface Select {
 	public TableReference fromTable(String table);
 	public SubSelect from();
 
-	@Deprecated
+	//@Deprecated
 	public Condition condition(Operator op, TableReference table1, String field1, Comparator c, TableReference table2, String field2);
-	@Deprecated
+	//@Deprecated
 	public Condition condition(Operator op, TableReference table1, String field1, Comparator c, Object value);
 
 	public Condition condition(Operator op);
@@ -28,9 +28,9 @@ public interface Select {
 
 	public void limit(int offset, int max);
 
-	@Deprecated
+	//@Deprecated
 	public void group(TableReference table, String field);
-	@Deprecated
+	//@Deprecated
 	public void order(TableReference table, String field, boolean ascending);
 
 	public void group(Field reference);
