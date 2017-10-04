@@ -162,7 +162,6 @@ public class MysqlCondition implements Condition {
 		}
 		
 		String s = StringUtils.join(parts," "); 
-		System.err.println("returning: "+s);
 
 		return s;
 
