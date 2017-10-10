@@ -74,6 +74,8 @@ public class MysqlField implements Field {
 				aggregate==Aggregate.MAX ||
 				aggregate==Aggregate.SUM ||
 				aggregate==Aggregate.CONCAT ||
+				aggregate==Aggregate.UPPER ||
+				aggregate==Aggregate.LOWER ||
 				aggregate==Aggregate.GROUP_CONCAT
 			) {
 			parts2.add(aggregate.name());
