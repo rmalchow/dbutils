@@ -75,8 +75,12 @@ public class ParsedEntity<T> {
 						return;
 					}
 				}
+			} 
+			if(field.getType()==Boolean.class && value!=null && value.getClass() == Integer.class) {
+				field.set(target, ((Integer)value).intValue()==1);
+			} else {
+				field.set(target, value);
 			}
-			field.set(target, value);
 		}
 		
 		public Object get(T target) throws IllegalArgumentException, IllegalAccessException {
