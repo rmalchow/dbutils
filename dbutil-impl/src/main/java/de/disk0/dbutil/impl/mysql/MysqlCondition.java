@@ -148,7 +148,6 @@ public class MysqlCondition implements Condition {
 			parts.add(leftField.getSql());
 			parts.add(c.getSymbol());
 			if(c == Comparator.NOT_NULL || c == Comparator.NULL) {
-				parts.add(c.getSymbol());
 			} else if(c == Comparator.IN) {
 				parts.add("("+rightField.getSql()+")");
 			} else if(c == Comparator.NOT_IN) {
