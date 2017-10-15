@@ -1,8 +1,5 @@
 package de.disk0.dbutil.impl;
 
-import java.lang.reflect.ParameterizedType;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,8 +11,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 import de.disk0.dbutil.api.entities.BaseEntity;
@@ -25,34 +20,19 @@ import de.disk0.dbutil.impl.util.ParsedEntity;
 import de.disk0.dbutil.impl.util.ParsedEntity.ParsedColumn;
 
 
-public abstract class AbstractRepository<T extends BaseEntity<S>,S> implements RowMapper<T> {
+public abstract class AbstractRepository<T extends BaseEntity<S>,S> extends AbstractMappingRepository<T> {
 
 	private static Log log = LogFactory.getLog(AbstractRepository.class);
 	
-	private Class<T> clazz;
-	
-	@Autowired
-	protected DataSource dataSource;
-
 	private String findOneStatement;
 	private String findAllStatement;
 	private String insertOneStatement;
 	private String updateOneStatement;
 	private String deleteOneStatement;
 	
-	private ParsedEntity<T> parsedEntity;
-	
 	public AbstractRepository() {
 	}
 	
-	@SuppressWarnings("unchecked")
-	protected Class<T> getClazz() {
-		if(clazz==null) {
-			clazz = (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
-		}
-		return clazz;
-	}
-
 	protected ParsedEntity<T> getParsedEntity() {
 		if(parsedEntity==null) {
 			parsedEntity = new ParsedEntity<>(getClazz()); 
@@ -203,39 +183,6 @@ public abstract class AbstractRepository<T extends BaseEntity<S>,S> implements R
 		}
 	}
 	
-	@SuppressWarnings("rawtypes")
-	protected MapSqlParameterSource unmap(T t) throws IllegalArgumentException, IllegalAccessException {
-		MapSqlParameterSource out = new MapSqlParameterSource();
-		for(ParsedColumn pc : getParsedEntity().getColumns()) {
-			Object o = pc.get(t);
-			out.addValue(pc.getColumnName(),o);
-		}
-		return out;
-	}
-	
-	@Override
-	public T mapRow(ResultSet rs, int c) throws SQLException {
-		try {
-			T out = getClazz().newInstance();
-			for(ParsedColumn pc : getParsedEntity().getColumns()) {
-				try {
-					pc.set(out, rs.getObject(pc.getColumnName()));
-				} catch (Exception e) {
-					throw new RuntimeException("failed to map column: "+pc.getColumnName(),e);
-				}
-			}
-			return out;
-		} catch (Exception e) {
-			throw new SQLException("failed to map and entity ("+e.getMessage()+")",e);
-		}
-	}
 
-	public DataSource getDataSource() {
-		return dataSource;
-	}
-
-	public void setDataSource(DataSource dataSource) {
-		this.dataSource = dataSource;
-	}	
 	
 }
