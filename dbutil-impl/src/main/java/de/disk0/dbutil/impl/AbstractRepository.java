@@ -40,32 +40,6 @@ public abstract class AbstractRepository<T extends BaseEntity<S>,S> extends Abst
 		return parsedEntity;
 	}
 	
-	public List<T> find(String sql, Map<String,Object> params) throws SqlException {
-		try {
-			NamedParameterJdbcTemplate t = new NamedParameterJdbcTemplate(getDataSource());
-			long start = System.currentTimeMillis();
-			log.debug("-------- query: "+sql+" / "+params);
-			List<T> out = t.query(sql, params, this);
-			log.debug("-------- found: "+out.size()+" / "+(System.currentTimeMillis()-start)+"ms");
-			return out;
-		} catch (Exception e) {
-			log.warn("-------- query failed: "+sql+" / "+params);
-			throw new SqlException("SQL.REPO.LIST_FAILED",new Object[] { e.getMessage() },  e);
-		}
-	}
-	
-	protected T findOne(String sql, Map<String,Object> params) throws SqlException {
-		try {
-			List<T> out = find(sql, params);
-			if(out.size()==0) return null;
-			if(out.size()==1) return out.get(0);
-		} catch (Exception e) {
-			log.warn("-------- query failed: "+sql+" / "+params);
-			throw new SqlException("SQL.REPO.LIST_FAILED",new Object[] { e.getMessage() },  e);
-		}
-		throw new NonUniqueResultException();
-	}
-	
 	protected String getFindOneStatement() {
 		if(findOneStatement == null) {
 			ParsedEntity<T> pe = getParsedEntity();
@@ -152,18 +126,6 @@ public abstract class AbstractRepository<T extends BaseEntity<S>,S> extends Abst
 	protected void afterDelete(T t) throws Exception {
 	}
 	
-	public void delete(String sql, Map<String,Object> params) throws SqlException {
-		try {
-			NamedParameterJdbcTemplate templ = new NamedParameterJdbcTemplate(getDataSource());
-			log.debug("-------- update: "+sql+" / "+params);
-			templ.update(sql, params);
-		} catch (Exception e) {
-			log.warn("-------- delete failed: "+sql+" / "+params);
-			throw new SqlException("SQL.REPO.DELETE_FAILED",new Object[] { e.getMessage() },  e);
-		}
-	}
-	
-	
 	public void delete(T t) throws SqlException {
 		String sql = "[none]";
 		try {
@@ -182,7 +144,6 @@ public abstract class AbstractRepository<T extends BaseEntity<S>,S> extends Abst
 			throw new SqlException("SQL.REPO.DELETE_FAILED",new Object[] { e.getMessage() },  e);
 		}
 	}
-	
 
 	
 }
