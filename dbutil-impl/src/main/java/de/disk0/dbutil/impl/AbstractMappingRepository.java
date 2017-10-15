@@ -39,10 +39,18 @@ public abstract class AbstractMappingRepository<T> implements RowMapper<T> {
 		return clazz;
 	}
 
+
+	protected ParsedEntity<T> getParsedEntity() {
+		if(parsedEntity==null) {
+			parsedEntity = new ParsedEntity<>(getClazz()); 
+		}
+		return parsedEntity;
+	}
+	
 	@SuppressWarnings("rawtypes")
 	protected MapSqlParameterSource unmap(T t) throws IllegalArgumentException, IllegalAccessException {
 		MapSqlParameterSource out = new MapSqlParameterSource();
-		for(ParsedColumn pc : parsedEntity.getColumns()) {
+		for(ParsedColumn pc : getParsedEntity().getColumns()) {
 			Object o = pc.get(t);
 			out.addValue(pc.getColumnName(),o);
 		}
@@ -53,7 +61,7 @@ public abstract class AbstractMappingRepository<T> implements RowMapper<T> {
 	public T mapRow(ResultSet rs, int c) throws SQLException {
 		try {
 			T out = getClazz().newInstance();
-			for(ParsedColumn pc : parsedEntity.getColumns()) {
+			for(ParsedColumn pc : getParsedEntity().getColumns()) {
 				try {
 					pc.set(out, rs.getObject(pc.getColumnName()));
 				} catch (Exception e) {

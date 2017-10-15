@@ -32,14 +32,7 @@ public abstract class AbstractRepository<T extends BaseEntity<S>,S> extends Abst
 	
 	public AbstractRepository() {
 	}
-	
-	protected ParsedEntity<T> getParsedEntity() {
-		if(parsedEntity==null) {
-			parsedEntity = new ParsedEntity<>(getClazz()); 
-		}
-		return parsedEntity;
-	}
-	
+
 	protected String getFindOneStatement() {
 		if(findOneStatement == null) {
 			ParsedEntity<T> pe = getParsedEntity();
