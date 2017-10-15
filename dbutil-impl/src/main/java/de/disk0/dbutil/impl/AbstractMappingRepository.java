@@ -103,7 +103,18 @@ public abstract class AbstractMappingRepository<T> implements RowMapper<T> {
 		}
 	}
 	
-
+	public void update(String sql, Map<String,Object> params) throws SqlException {
+		try {
+			NamedParameterJdbcTemplate templ = new NamedParameterJdbcTemplate(getDataSource());
+			log.debug("-------- update: "+sql+" / "+params);
+			templ.update(sql, params);
+		} catch (Exception e) {
+			log.warn("-------- delete failed: "+sql+" / "+params);
+			throw new SqlException("SQL.REPO.DELETE_FAILED",new Object[] { e.getMessage() },  e);
+		}
+	}
+	
+	
 	
 	
 
