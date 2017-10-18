@@ -13,5 +13,6 @@ public interface TableReference extends SqlFragment {
 	public Field field(String fieldname);
 	public Field value(Object value);
 	public Field field(Aggregate a, Field... fr);
+	public Field field(Aggregate a, String fieldName);
 	
 }

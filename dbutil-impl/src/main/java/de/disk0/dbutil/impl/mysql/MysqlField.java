@@ -40,6 +40,12 @@ public class MysqlField implements Field {
 		this.field = field;
 	}
 	
+	public MysqlField(Aggregate aggregate, TableReference tr, String field) {
+		this.aggregate = aggregate;
+		this.table = tr.getAlias();
+		this.field = field;
+	}
+	
 	public MysqlField(Field fr, String alias) {
 		fields.add(fr);
 		this.alias = alias;
