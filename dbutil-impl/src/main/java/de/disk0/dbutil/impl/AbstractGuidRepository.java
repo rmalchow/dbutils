@@ -20,13 +20,17 @@ public abstract class AbstractGuidRepository<T extends BaseGuidEntity> extends A
 		T t = get(id);
 		super.delete(t);
 	}
-	
+
 	public T save(T t) throws SqlException {
+		return save(t,UUID.randomUUID().toString());
+	}
+	
+	public T save(T t, String uuid) throws SqlException {
 		try {
 			beforeSave(t);
 			NamedParameterJdbcTemplate templ = new NamedParameterJdbcTemplate(getDataSource());
 			if(t.getId()==null) {
-				t.setId(UUID.randomUUID().toString());
+				t.setId(uuid);
 				String sql = getInsertOneStatement();
 				
 				MapSqlParameterSource params = unmap(t);
