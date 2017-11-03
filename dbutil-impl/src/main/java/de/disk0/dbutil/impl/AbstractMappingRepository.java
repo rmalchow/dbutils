@@ -62,10 +62,13 @@ public abstract class AbstractMappingRepository<T> implements RowMapper<T> {
 		try {
 			T out = getClazz().newInstance();
 			for(ParsedColumn pc : getParsedEntity().getColumns()) {
+				Object o = null; 
+				String s = pc.getColumnName();
 				try {
-					pc.set(out, rs.getObject(pc.getColumnName()));
+					o = rs.getObject(s);
+					pc.set(out, o);
 				} catch (Exception e) {
-					throw new RuntimeException("failed to map column: "+pc.getColumnName(),e);
+					throw new RuntimeException("failed to map column: "+pc.getColumnName()+" / "+o,e);
 				}
 			}
 			return out;
