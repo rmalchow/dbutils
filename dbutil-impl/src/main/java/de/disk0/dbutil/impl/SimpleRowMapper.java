@@ -1,6 +1,5 @@
 package de.disk0.dbutil.impl;
 
-import java.lang.reflect.ParameterizedType;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;

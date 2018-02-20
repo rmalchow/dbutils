@@ -31,6 +31,9 @@ public abstract class AbstractMappingRepository<T> implements RowMapper<T> {
 	
 	protected Class<T> clazz;
 	
+	@Autowired
+	private NamedParameterJdbcTemplate template;
+	
 	@SuppressWarnings("unchecked")
 	protected Class<T> getClazz() {
 		if(clazz==null) {
@@ -103,6 +106,15 @@ public abstract class AbstractMappingRepository<T> implements RowMapper<T> {
 		throw new NonUniqueResultException();
 	}
 
+	public void delete(SimpleQuery q) throws SqlException {
+		this.delete(q.getQuery(),q.getParams());
+	}
+	
+	public void update(SimpleQuery q) throws SqlException {
+		this.update(q.getQuery(),q.getParams());
+	}
+	
+	
 	public void delete(String sql, Map<String,Object> params) throws SqlException {
 		try {
 			NamedParameterJdbcTemplate templ = new NamedParameterJdbcTemplate(getDataSource());
@@ -126,8 +138,12 @@ public abstract class AbstractMappingRepository<T> implements RowMapper<T> {
 	}
 	
 	
-	
-	
+	public NamedParameterJdbcTemplate getTemplate() {
+		if(template==null) {
+			template = new NamedParameterJdbcTemplate(getDataSource());
+		}
+		return template;
+	}
 
 	public DataSource getDataSource() {
 		return dataSource;

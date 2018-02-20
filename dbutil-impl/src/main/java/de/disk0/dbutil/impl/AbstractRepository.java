@@ -5,16 +5,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.sql.DataSource;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 import de.disk0.dbutil.api.entities.BaseEntity;
-import de.disk0.dbutil.api.exceptions.NonUniqueResultException;
 import de.disk0.dbutil.api.exceptions.SqlException;
 import de.disk0.dbutil.impl.util.ParsedEntity;
 import de.disk0.dbutil.impl.util.ParsedEntity.ParsedColumn;
