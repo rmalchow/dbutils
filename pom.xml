@@ -8,6 +8,7 @@
 	<modules>
 		<module>dbutil-api</module>
 		<module>dbutil-impl</module>
+		<module>dbutils-examples</module>
 	</modules>
 	<properties>
 		<maven.compiler.debug>true</maven.compiler.debug>
