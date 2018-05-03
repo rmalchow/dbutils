@@ -25,6 +25,7 @@ public class MysqlSelect implements Select {
 	private Condition wc;
 	private List<SortOrder> order = new ArrayList<>();
 	private List<Field> group = new ArrayList<>();
+	private List<Select> unions = new ArrayList<>();
 	
 	private int offset = -1;
 	private int max = -1;
@@ -38,8 +39,6 @@ public class MysqlSelect implements Select {
 	public MysqlSelect(AliasGenerator aliasGenerator) {
 		this.aliasGenerator = aliasGenerator;
 	}
-	
-	
 	
 	@Override
 	public Field addSelect(Aggregate aggregate, TableReference tableReference, String field, String alias) {
@@ -101,6 +100,13 @@ public class MysqlSelect implements Select {
 		return s;
 	}
 
+	@Override
+	public Select union() {
+		Select s = new MysqlSelect(aliasGenerator);
+		this.unions.add(s);
+		return s;
+	}
+	
 	@Override
 	public Condition condition(Operator op) {
 		if(wc==null) {
@@ -191,7 +197,18 @@ public class MysqlSelect implements Select {
 			parts.add(max+"");
 		}
 		
-		return StringUtils.join(parts," ");
+		String out = StringUtils.join(parts," "); 
+		
+		if(unions.size()>0) {
+			parts.clear();
+			parts.add("("+out+")");
+			for(Select s : unions) {
+				parts.add("("+s.getSql()+")");
+			}
+			out = StringUtils.join(parts, " UNION ");
+		}
+		
+		return out;
 	}
 
 	@Override
@@ -235,6 +252,11 @@ public class MysqlSelect implements Select {
 		if(wc!=null) {
 			out.putAll(wc.getParams());
 		}
+		
+		for(Select s : unions) {
+			out.putAll(s.getParams());
+		}
+		
 		return out;
 	}
 

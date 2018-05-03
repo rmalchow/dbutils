@@ -4,6 +4,7 @@ import java.util.Map;
 
 public interface Select {
 
+	
 	//@Deprecated
 	public Field addSelect(Object value, String alias);
 	//@Deprecated
@@ -15,6 +16,7 @@ public interface Select {
 
 	public TableReference fromTable(String table);
 	public SubSelect from();
+	public Select union();
 
 	//@Deprecated
 	public Condition condition(Operator op, TableReference table1, String field1, Comparator c, TableReference table2, String field2);
