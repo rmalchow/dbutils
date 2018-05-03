@@ -37,14 +37,14 @@ public class SimpleRowMapper<T> implements RowMapper<T> {
 			T out = clazz.newInstance();
 			for(ParsedColumn pc : getParsedEntity().getColumns()) {
 				try {
-					pc.set(out, rs.getObject(pc.getColumnName()));
+					pc.set(out, rs);
 				} catch (Exception e) {
 					throw new RuntimeException("failed to map column: "+pc.getColumnName(),e);
 				}
 			}
 			return out;
 		} catch (Exception e) {
-			throw new SQLException("failed to map and entity ("+e.getMessage()+")",e);
+			throw new SQLException("failed to map entity ("+clazz+") "+e.getMessage(),e);
 		}
 	}
 	

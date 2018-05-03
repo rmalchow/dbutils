@@ -3,6 +3,7 @@ package de.disk0.dbutil.impl;
 import java.lang.reflect.ParameterizedType;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -30,6 +31,8 @@ public abstract class AbstractMappingRepository<T> implements RowMapper<T> {
 	protected ParsedEntity<T> parsedEntity;
 	
 	protected Class<T> clazz;
+	
+	private List<String> applicableColumns;
 	
 	@Autowired
 	private NamedParameterJdbcTemplate template;
@@ -63,20 +66,34 @@ public abstract class AbstractMappingRepository<T> implements RowMapper<T> {
 	@Override
 	public T mapRow(ResultSet rs, int c) throws SQLException {
 		try {
+
+			log.info("mapping row ... ");
+			
+			if(applicableColumns==null) {
+				synchronized (this) {
+					applicableColumns = new ArrayList<>();
+					for(int i=0;i<rs.getMetaData().getColumnCount();i++) {
+						applicableColumns.add(rs.getMetaData().getColumnName(i+1).toUpperCase());
+					}
+				}
+			}
+			
 			T out = getClazz().newInstance();
 			for(ParsedColumn pc : getParsedEntity().getColumns()) {
-				Object o = null; 
-				String s = pc.getColumnName();
+				if(!applicableColumns.contains(pc.getColumnName().toUpperCase())) {
+					log.warn("column: "+pc.getColumnName()+" in object, but not in result set");
+					continue;
+				}
 				try {
-					o = rs.getObject(s);
-					pc.set(out, o);
+					pc.set(out, rs);
 				} catch (Exception e) {
-					throw new RuntimeException("failed to map column: "+pc.getColumnName()+" / "+o,e);
+					throw new RuntimeException("failed to map column: "+pc.getColumnName(),e);
 				}
 			}
 			return out;
 		} catch (Exception e) {
-			throw new SQLException("failed to map and entity ("+e.getMessage()+")",e);
+			log.error("failed to map entity: ",e);
+			throw new SQLException("failed to map entity ("+e.getMessage()+")",e);
 		}
 	}
 	

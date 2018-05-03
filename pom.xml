@@ -3,11 +3,12 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.disk0.dbutil</groupId>
 	<artifactId>dbutil</artifactId>
-	<version>0.0.33-SNAPSHOT</version>
+	<version>0.0.34-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<modules>
 		<module>dbutil-api</module>
 		<module>dbutil-impl</module>
+		<module>dbutils-examples</module>
 	</modules>
 	<properties>
 		<maven.compiler.debug>true</maven.compiler.debug>

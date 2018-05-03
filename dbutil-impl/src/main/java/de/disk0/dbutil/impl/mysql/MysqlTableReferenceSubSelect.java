@@ -108,6 +108,10 @@ public class MysqlTableReferenceSubSelect extends MysqlTableReferenceSimple impl
 		return select.from();
 	}
 
+	public Select union() {
+		return select.union();
+	}
+	
 	public Condition condition(Operator op, TableReference table1, String field1, Comparator c, TableReference table2,
 			String field2) {
 		return select.condition(op, table1, field1, c, table2, field2);

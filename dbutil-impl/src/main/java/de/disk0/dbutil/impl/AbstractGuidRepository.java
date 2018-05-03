@@ -37,18 +37,19 @@ public abstract class AbstractGuidRepository<T extends BaseGuidEntity> extends A
 				
 				log.debug("saving entity: insert!");
 				log.debug("INSERT: "+sql);
-				log.debug("INSERT: "+params);
+				log.debug("INSERT: "+params.getValues());
 				templ.update(sql, params);
 			} else {
 				String sql = getUpdateOneStatement();
 				MapSqlParameterSource params = unmap(t);
 				log.debug("saving entity: update!");
 				log.debug("UPDATE: "+sql);
-				log.debug("UPDATE: "+params);
+				log.debug("UPDATE: "+params.getValues());
 				templ.update(sql, params);
 			}
 			afterSave(t);
-			return get(t.getId());
+			T out = get(t.getId());
+			return out;
 		} catch (Exception e) {
 			throw new SqlException("SQL.REPO.SAVE_FAILED",new Object[] { e.getMessage() },  e);
 		}

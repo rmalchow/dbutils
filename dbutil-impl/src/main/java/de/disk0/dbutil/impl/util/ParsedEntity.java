@@ -1,13 +1,20 @@
 package de.disk0.dbutil.impl.util;
 
 import java.lang.reflect.Field;
+import java.math.BigDecimal;
+import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Table;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class ParsedEntity<T> {
+	
+	private static Log log = LogFactory.getLog(ParsedEntity.class);
 	
 	private String tableName;
 	private List<ParsedColumn> columns = new ArrayList<>();
@@ -63,23 +70,37 @@ public class ParsedEntity<T> {
 			return column;
 		}
 		
-		public void set(T target, Object value) throws IllegalArgumentException, IllegalAccessException {
-			if(Enum.class.isAssignableFrom(field.getType())) {
-				if(value==null) {
-					field.set(target, null);
-					return;
-				}
-				for(Object o : field.getType().getEnumConstants()) {
-					if(o.toString().compareTo(value.toString())==0) {
-						field.set(target, o);
-						return;
+		public void set(T target, ResultSet rs) throws IllegalArgumentException, IllegalAccessException {
+			try {
+
+				if(field.getType()==String.class) {
+					field.set(target,rs.getString(column));
+				} else if(field.getType()==BigDecimal.class) {
+					field.set(target,rs.getBigDecimal(column));
+				} else if(field.getType()==Integer.class || field.getType()==Integer.TYPE) {
+					field.set(target,rs.getInt(column));
+				} else if(field.getType()==Long.class || field.getType()==Long.TYPE) {
+					field.set(target,rs.getLong(column));
+				} else if(field.getType()==Boolean.class || field.getType()==Boolean.TYPE) {
+					field.set(target,rs.getBoolean(column));
+				} else if(Enum.class.isAssignableFrom(field.getType())) {
+					String value = rs.getString(column);
+					if(value==null) {
+						field.set(target, null);
+					} else {
+						for(Object o : field.getType().getEnumConstants()) {
+							if(o.toString().compareTo(value.toString())==0) {
+								field.set(target, o);
+							}
+						}
 					}
+				} else {
+					field.set(target, rs.getObject(column));
 				}
-			} 
-			if(field.getType()==Boolean.class && value!=null && value.getClass() == Integer.class) {
-				field.set(target, ((Integer)value).intValue()==1);
-			} else {
-				field.set(target, value);
+				
+			} catch (Exception e) {
+				log.error("error mapping "+column+": ",e);
+				throw new IllegalArgumentException("error mapping "+column+": ",e);
 			}
 		}
 		
