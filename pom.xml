@@ -9,6 +9,7 @@
 		<module>dbutil-api</module>
 		<module>dbutil-impl</module>
 		<module>dbutils-examples</module>
+		<module>dbutil-schema-check</module>
 	</modules>
 	<properties>
 		<maven.compiler.debug>true</maven.compiler.debug>
