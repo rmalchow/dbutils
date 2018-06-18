@@ -1,5 +1,6 @@
 package de.disk0.dbutil.schemacheck;
 
+import java.security.MessageDigest;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -8,24 +9,28 @@ import java.util.List;
 import java.util.Map;
 
 import javax.sql.DataSource;
+import javax.xml.bind.DatatypeConverter;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
 @Service
 public class SchemaCheckService {
 	
+	private static Log log = LogFactory.getLog(SchemaCheckService.class);
+	
 	@Autowired
 	private DataSource dataSource;
 	
-	@Scheduled(fixedDelay=60000)
+	@Scheduled(fixedDelay=600000)
 	public void checkSchema() {
 		List<Table> tables = new ArrayList<>();
 		try {
@@ -50,9 +55,14 @@ public class SchemaCheckService {
 		}
 		
 		try {
-			System.err.println(new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT).writeValueAsString(tables));
-		} catch (JsonProcessingException e) {
-			e.printStackTrace();
+			String s = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT).writeValueAsString(tables);
+			MessageDigest md = MessageDigest.getInstance("MD5");
+		    md.update(s.getBytes());
+		    byte[] digest = md.digest();
+		    String myHash = DatatypeConverter.printHexBinary(digest).toUpperCase();
+			log.info(" ---> DB state: "+myHash);
+		} catch (Exception e) {
+			log.error("error checking db state: ",e);
 		}
 		
 	}
