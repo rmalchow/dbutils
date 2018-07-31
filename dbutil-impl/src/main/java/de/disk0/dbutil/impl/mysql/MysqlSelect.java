@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.Table;
+
 import org.apache.commons.lang3.StringUtils;
 
 import de.disk0.dbutil.api.Aggregate;
@@ -16,6 +18,7 @@ import de.disk0.dbutil.api.Select;
 import de.disk0.dbutil.api.SqlFragment;
 import de.disk0.dbutil.api.SubSelect;
 import de.disk0.dbutil.api.TableReference;
+import de.disk0.dbutil.api.entities.BaseEntity;
 import de.disk0.dbutil.impl.util.AliasGenerator;
 
 public class MysqlSelect implements Select {
@@ -87,8 +90,19 @@ public class MysqlSelect implements Select {
 	}
 	
 	@Override
-	public TableReference fromTable(String table) {
-		TableReference t = new MysqlTableReferenceSimple(this.aliasGenerator,table);
+	public TableReference fromTable(Object table) {
+		String tn = null;
+		if(table instanceof String) {
+			tn = (String)table;
+		} if(table instanceof Class) {
+			tn = ((Table)((Class)table).getAnnotation(Table.class)).name();
+		} else if(table.getClass().getAnnotation(Table.class)!=null) {
+			tn = table.getClass().getAnnotation(Table.class).name();
+		} else {
+			tn = table.toString();
+		}
+		
+		TableReference t = new MysqlTableReferenceSimple(this.aliasGenerator,tn);
 		tr.add(t);
 		return t;
 	}

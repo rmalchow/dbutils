@@ -100,7 +100,7 @@ public class MysqlTableReferenceSubSelect extends MysqlTableReferenceSimple impl
 	}
 	
 	
-	public TableReference fromTable(String table) {
+	public TableReference fromTable(Object table) {
 		return select.fromTable(table);
 	}
 

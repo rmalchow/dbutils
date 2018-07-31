@@ -14,7 +14,7 @@ public interface Select {
 	public Field addSelect(Aggregate a, String alias, Field... references);
 	public Field addSelect(Field fr, String alias);
 
-	public TableReference fromTable(String table);
+	public TableReference fromTable(Object table);
 	public SubSelect from();
 	public Select union();
 
