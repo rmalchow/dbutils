@@ -17,7 +17,7 @@ public interface Select {
 	public Field addSelect(Field fr, String alias);
 
 	public TableReference fromTable(String table);
-	public TableReference fromTable(Class<BaseEntity<?>> table);
+	public TableReference fromTable(Class<? extends BaseEntity<?>> table);
 	public SubSelect from();
 	public Select union();
 

@@ -91,7 +91,7 @@ public class MysqlSelect implements Select {
 	
 	
 	@Override
-	public TableReference fromTable(Class<BaseEntity<?>> table) {
+	public TableReference fromTable(Class<? extends BaseEntity<?>> table) {
 		return fromTable(table.getAnnotation(Table.class).name());
 	}
 	

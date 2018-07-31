@@ -4,14 +4,14 @@
 	<parent>
 		<groupId>de.disk0.dbutil</groupId>
 		<artifactId>dbutil</artifactId>
-		<version>0.0.38-SNAPSHOT</version>
+		<version>0.0.38</version>
 	</parent>
 	<artifactId>dbutil-impl</artifactId>
 	<dependencies>
 		<dependency>
 			<groupId>de.disk0.dbutil</groupId>
 			<artifactId>dbutil-api</artifactId>
-			<version>0.0.38-SNAPSHOT</version>
+			<version>0.0.38</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>

@@ -9,10 +9,10 @@ public interface TableReference extends SqlFragment {
 	public String getName();
 
 	public JoinTable leftJoin(String table);
-	public JoinTable leftJoin(Class<BaseEntity<?>> table);
+	public JoinTable leftJoin(Class<? extends BaseEntity<?>> table);
 	
 	public JoinTable join(String table);
-	public JoinTable join(Class<BaseEntity<?>> table);
+	public JoinTable join(Class<? extends BaseEntity<?>> table);
 
 	public Field field(String fieldname);
 	public Field value(Object value);

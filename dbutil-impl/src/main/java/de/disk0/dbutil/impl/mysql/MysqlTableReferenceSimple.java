@@ -72,7 +72,7 @@ public class MysqlTableReferenceSimple implements TableReference {
 	}
 
 	@Override
-	public JoinTable leftJoin(Class<BaseEntity<?>> table) {
+	public JoinTable leftJoin(Class<? extends BaseEntity<?>> table) {
 		return leftJoin(table.getAnnotation(Table.class).name());
 	}
 	
@@ -85,7 +85,7 @@ public class MysqlTableReferenceSimple implements TableReference {
 	}
 
 	@Override
-	public JoinTable join(Class<BaseEntity<?>> table) {
+	public JoinTable join(Class<? extends BaseEntity<?>> table) {
 		return join(table.getAnnotation(Table.class).name());
 	}
 	
