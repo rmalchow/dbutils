@@ -1,5 +1,7 @@
 package de.disk0.dbutil.api;
 
+import de.disk0.dbutil.api.entities.BaseEntity;
+
 public interface TableReference extends SqlFragment {
 	
 	public String getAlias();
@@ -7,8 +9,10 @@ public interface TableReference extends SqlFragment {
 	public String getName();
 
 	public JoinTable leftJoin(String table);
+	public JoinTable leftJoin(Class<BaseEntity<?>> table);
 	
 	public JoinTable join(String table);
+	public JoinTable join(Class<BaseEntity<?>> table);
 
 	public Field field(String fieldname);
 	public Field value(Object value);

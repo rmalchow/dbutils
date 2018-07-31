@@ -89,18 +89,15 @@ public class MysqlSelect implements Select {
 		return f2;
 	}
 	
+	
 	@Override
-	public TableReference fromTable(Object table) {
-		String tn = null;
-		if(table instanceof String) {
-			tn = (String)table;
-		} if(table instanceof Class) {
-			tn = ((Table)((Class)table).getAnnotation(Table.class)).name();
-		} else if(table.getClass().getAnnotation(Table.class)!=null) {
-			tn = table.getClass().getAnnotation(Table.class).name();
-		} else {
-			tn = table.toString();
-		}
+	public TableReference fromTable(Class<BaseEntity<?>> table) {
+		return fromTable(table.getAnnotation(Table.class).name());
+	}
+	
+	@Override
+	public TableReference fromTable(String table) {
+		String tn = table;
 		
 		TableReference t = new MysqlTableReferenceSimple(this.aliasGenerator,tn);
 		tr.add(t);

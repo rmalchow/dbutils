@@ -5,12 +5,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.Table;
+
 import org.apache.commons.lang3.StringUtils;
 
 import de.disk0.dbutil.api.Aggregate;
 import de.disk0.dbutil.api.Field;
 import de.disk0.dbutil.api.JoinTable;
 import de.disk0.dbutil.api.TableReference;
+import de.disk0.dbutil.api.entities.BaseEntity;
 import de.disk0.dbutil.impl.util.AliasGenerator;
 
 public class MysqlTableReferenceSimple implements TableReference {
@@ -69,6 +72,11 @@ public class MysqlTableReferenceSimple implements TableReference {
 	}
 
 	@Override
+	public JoinTable leftJoin(Class<BaseEntity<?>> table) {
+		return leftJoin(table.getAnnotation(Table.class).name());
+	}
+	
+	@Override
 	public JoinTable leftJoin(String table) {
 		MysqlTableReferenceSimple s = new MysqlTableReferenceSimple(this.aliasGenerator,table);
 		MysqlTableReferenceJoinTable j = new MysqlTableReferenceJoinTable(this.aliasGenerator, s, true);
@@ -76,6 +84,11 @@ public class MysqlTableReferenceSimple implements TableReference {
 		return j;
 	}
 
+	@Override
+	public JoinTable join(Class<BaseEntity<?>> table) {
+		return join(table.getAnnotation(Table.class).name());
+	}
+	
 	@Override
 	public JoinTable join(String table) {
 		MysqlTableReferenceSimple s = new MysqlTableReferenceSimple(this.aliasGenerator,table);
