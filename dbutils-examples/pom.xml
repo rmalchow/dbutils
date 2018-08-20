@@ -5,14 +5,14 @@
 	<parent>
 		<groupId>de.disk0.dbutil</groupId>
 		<artifactId>dbutil</artifactId>
-		<version>0.0.39-SNAPSHOT</version>
+		<version>0.0.40-SNAPSHOT</version>
 	</parent>
 	<artifactId>dbutils-examples</artifactId>
 	<dependencies>
 		<dependency>
 			<groupId>de.disk0.dbutil</groupId>
 			<artifactId>dbutil-impl</artifactId>
-			<version>0.0.39-SNAPSHOT</version>
+			<version>0.0.40-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 </project>
