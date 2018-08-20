@@ -1,12 +1,14 @@
 package de.disk0.dbutil.impl;
 
 import java.lang.reflect.ParameterizedType;
+import java.security.InvalidParameterException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
@@ -45,10 +47,21 @@ public abstract class AbstractMappingRepository<T> implements RowMapper<T> {
 		return clazz;
 	}
 
-
-	protected ParsedEntity<T> getParsedEntity() {
+	@PostConstruct
+	public ParsedEntity<T> getParsedEntity() {
 		if(parsedEntity==null) {
-			parsedEntity = new ParsedEntity<>(getClazz()); 
+			try {
+				parsedEntity = new ParsedEntity<>(getClazz()); 
+				if(parsedEntity.getTableName()==null) {
+					throw new InvalidParameterException("entity "+getClazz()+" has no table");
+				}
+				if(parsedEntity.getColumns().size()==0) {
+					throw new InvalidParameterException("entity "+getClazz()+" has no columns");
+				}
+			} catch (Exception e) {
+				log.error("unable to parse entity: "+getClazz()+"! ",e);
+				throw e;
+			}
 		}
 		return parsedEntity;
 	}
@@ -67,8 +80,6 @@ public abstract class AbstractMappingRepository<T> implements RowMapper<T> {
 	public T mapRow(ResultSet rs, int c) throws SQLException {
 		try {
 
-			log.info("mapping row ... ");
-			
 			if(applicableColumns==null) {
 				synchronized (this) {
 					applicableColumns = new ArrayList<>();
