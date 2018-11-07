@@ -19,7 +19,7 @@ public class TableFromObjectTest {
 		
 		s.addSelect(tr.field(Aggregate.AVG, "value"),"avg_value");
 		
-		Assert.assertEquals("SELECT avg (`hund_1`.`value`) AS `avg_value` FROM `hund` `hund_1`", s.getSql());
+		Assert.assertEquals("SELECT avg(`hund_1`.`value`) AS `avg_value` FROM `hund` `hund_1`", s.getSql());
 		
 		
 	}

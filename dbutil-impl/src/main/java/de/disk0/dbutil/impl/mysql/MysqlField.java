@@ -87,8 +87,7 @@ public class MysqlField implements Field {
 				aggregate==Aggregate.COUNT ||
 				aggregate==Aggregate.GROUP_CONCAT
 			) {
-			parts2.add(aggregate.name().toLowerCase());
-			parts2.add("("+t+")");
+			parts2.add(String.format("%s(%s)", aggregate.name().toLowerCase(), t));
 		} else {
 			parts2.add(t);
 		}

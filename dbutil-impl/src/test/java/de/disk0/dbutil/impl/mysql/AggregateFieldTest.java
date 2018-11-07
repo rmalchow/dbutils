@@ -20,7 +20,7 @@ public class AggregateFieldTest {
 		
 		s.addSelect(tr.field(Aggregate.COUNT, "value"),"cnt_value");
 
-		Assert.assertEquals("SELECT avg (`hund_1`.`value`) AS `avg_value`, count (`hund_1`.`value`) AS `cnt_value` FROM `hund` `hund_1`", s.getSql());
+		Assert.assertEquals("SELECT avg(`hund_1`.`value`) AS `avg_value`, count(`hund_1`.`value`) AS `cnt_value` FROM `hund` `hund_1`", s.getSql());
 		
 		
 	}
