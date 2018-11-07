@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>de.disk0.dbutil</groupId>
 		<artifactId>dbutil</artifactId>
-		<version>0.0.41</version>
+		<version>0.0.42-SNAPSHOT</version>
 	</parent>
 	<artifactId>dbutil-schema-check</artifactId>
 	<dependencies>
