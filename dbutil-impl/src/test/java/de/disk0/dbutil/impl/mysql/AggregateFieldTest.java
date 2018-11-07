@@ -18,6 +18,8 @@ public class AggregateFieldTest {
 		
 		s.addSelect(tr.field(Aggregate.AVG, "value"),"avg_value");
 		
+		s.addSelect(tr.field(Aggregate.AVG, "value"),"avg_value");
+
 		Assert.assertEquals("SELECT AVG (`hund_1`.`value`) AS `avg_value` FROM `hund` `hund_1`", s.getSql());
 		
 		
