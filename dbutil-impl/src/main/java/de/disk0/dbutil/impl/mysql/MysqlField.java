@@ -84,6 +84,7 @@ public class MysqlField implements Field {
 				aggregate==Aggregate.CONCAT ||
 				aggregate==Aggregate.UPPER ||
 				aggregate==Aggregate.LOWER ||
+				aggregate==Aggregate.COUNT ||
 				aggregate==Aggregate.GROUP_CONCAT
 			) {
 			parts2.add(aggregate.name());
