@@ -3,6 +3,7 @@ package de.disk0.dbutil.impl;
 import java.lang.reflect.ParameterizedType;
 import java.security.InvalidParameterException;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -84,16 +85,23 @@ public abstract class AbstractMappingRepository<T> implements RowMapper<T> {
 				synchronized (this) {
 					applicableColumns = new ArrayList<>();
 					for(int i=0;i<rs.getMetaData().getColumnCount();i++) {
-						applicableColumns.add(rs.getMetaData().getColumnName(i+1).toUpperCase());
+						applicableColumns.add(rs.getMetaData().getColumnLabel(i+1).toUpperCase());
 					}
 				}
 			}
 			
 			T out = getClazz().newInstance();
 			for(ParsedColumn pc : getParsedEntity().getColumns()) {
+				log.info("parsing: "+pc.getColumnName());
 				if(!applicableColumns.contains(pc.getColumnName().toUpperCase())) {
 					log.warn("column: "+pc.getColumnName()+" in object, but not in result set");
+					ResultSetMetaData md = rs.getMetaData();
+					for(int i=0; i < md.getColumnCount();i++) {
+						log.warn(" ---- "+md.getColumnName(i+1)+" / "+md.getColumnLabel(i+1));
+					}
 					continue;
+				} else {
+					log.info("column: "+pc.getColumnName()+" in object AND in result set");
 				}
 				try {
 					pc.set(out, rs);
