@@ -26,7 +26,7 @@ import de.disk0.dbutil.impl.util.ParsedEntity.ParsedColumn;
 
 public abstract class AbstractMappingRepository<T> implements RowMapper<T> {
 	
-	private static Log log = LogFactory.getLog(AbstractRepository.class);
+	private static Log log = LogFactory.getLog(AbstractMappingRepository.class);
 
 	@Autowired
 	protected DataSource dataSource;
@@ -92,7 +92,7 @@ public abstract class AbstractMappingRepository<T> implements RowMapper<T> {
 			
 			T out = getClazz().newInstance();
 			for(ParsedColumn pc : getParsedEntity().getColumns()) {
-				log.info("parsing: "+pc.getColumnName());
+				log.debug("parsing: "+pc.getColumnName());
 				if(!applicableColumns.contains(pc.getColumnName().toUpperCase())) {
 					log.warn("column: "+pc.getColumnName()+" in object, but not in result set");
 					ResultSetMetaData md = rs.getMetaData();
@@ -101,7 +101,7 @@ public abstract class AbstractMappingRepository<T> implements RowMapper<T> {
 					}
 					continue;
 				} else {
-					log.info("column: "+pc.getColumnName()+" in object AND in result set");
+					log.debug("column: "+pc.getColumnName()+" in object AND in result set");
 				}
 				try {
 					pc.set(out, rs);
