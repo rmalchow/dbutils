@@ -98,7 +98,7 @@ public class ParsedEntity<T> {
 					field.set(target, rs.getObject(column));
 				}
 				
-				log.info("mapping column: "+column+" - "+rs.getObject(column));
+				log.debug("mapping column: "+column+" - "+rs.getObject(column));
 				
 			} catch (Exception e) {
 				log.error("error mapping "+column+": ",e);
