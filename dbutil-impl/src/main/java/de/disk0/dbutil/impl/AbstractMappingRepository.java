@@ -37,7 +37,6 @@ public abstract class AbstractMappingRepository<T> implements RowMapper<T> {
 	
 	private List<String> applicableColumns;
 	
-	@Autowired
 	private NamedParameterJdbcTemplate template;
 	
 	@SuppressWarnings("unchecked")
