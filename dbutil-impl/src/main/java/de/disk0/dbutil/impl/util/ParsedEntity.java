@@ -78,18 +78,21 @@ public class ParsedEntity<T> {
 				} else if(field.getType()==BigDecimal.class) {
 					field.set(target,rs.getBigDecimal(column));
 				} else if(field.getType()==Integer.class || field.getType()==Integer.TYPE) {
-					field.set(target,rs.getInt(column));
+					int value = rs.getInt(column);
+					field.set(target, rs.wasNull() ? null : value);
 				} else if(field.getType()==Long.class || field.getType()==Long.TYPE) {
-					field.set(target,rs.getLong(column));
+					long value = rs.getLong(column);
+					field.set(target, rs.wasNull() ? null : value);
 				} else if(field.getType()==Boolean.class || field.getType()==Boolean.TYPE) {
-					field.set(target,rs.getBoolean(column));
+					boolean value = rs.getBoolean(column);
+					field.set(target, rs.wasNull() ? null : value);
 				} else if(Enum.class.isAssignableFrom(field.getType())) {
 					String value = rs.getString(column);
 					if(value==null) {
 						field.set(target, null);
 					} else {
 						for(Object o : field.getType().getEnumConstants()) {
-							if(o.toString().compareTo(value.toString())==0) {
+							if(o.toString().compareTo(value)==0) {
 								field.set(target, o);
 							}
 						}
