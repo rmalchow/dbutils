@@ -75,17 +75,31 @@ public class ParsedEntity<T> {
 
 				if(field.getType()==String.class) {
 					field.set(target,rs.getString(column));
+
 				} else if(field.getType()==BigDecimal.class) {
 					field.set(target,rs.getBigDecimal(column));
+
 				} else if(field.getType()==Integer.class || field.getType()==Integer.TYPE) {
-					int value = rs.getInt(column);
-					field.set(target, rs.wasNull() ? null : value);
-				} else if(field.getType()==Long.class || field.getType()==Long.TYPE) {
+                    int value = rs.getInt(column);
+                    if (field.getType().isPrimitive() && rs.wasNull()) {
+                        throw new NullPointerException("Cannot set NULL value to field with type int");
+                    }
+                    field.set(target, rs.wasNull() ? null : value);
+
+                } else if(field.getType()==Long.class || field.getType()==Long.TYPE) {
 					long value = rs.getLong(column);
+                    if (field.getType().isPrimitive() && rs.wasNull()) {
+                        throw new NullPointerException("Cannot set NULL value to field with type long");
+                    }
 					field.set(target, rs.wasNull() ? null : value);
+
 				} else if(field.getType()==Boolean.class || field.getType()==Boolean.TYPE) {
 					boolean value = rs.getBoolean(column);
+                    if (field.getType().isPrimitive() && rs.wasNull()) {
+                        throw new NullPointerException("Cannot set NULL value to field with type boolean");
+                    }
 					field.set(target, rs.wasNull() ? null : value);
+
 				} else if(Enum.class.isAssignableFrom(field.getType())) {
 					String value = rs.getString(column);
 					if(value==null) {
