@@ -116,7 +116,6 @@ public class ParsedEntity<T> {
 				}
 				
 				log.debug("mapping column: "+column+" - "+rs.getObject(column));
-				
 			} catch (Exception e) {
 				log.error("error mapping "+column+": ",e);
 				throw new IllegalArgumentException("error mapping "+column+": ",e);
