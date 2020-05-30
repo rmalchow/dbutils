@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.0.9.RELEASE</version>
+		<version>2.3.0.RELEASE</version>
 	</parent>
 
 	<groupId>de.disk0.dbutil</groupId>
@@ -27,8 +27,8 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>org.hibernate.javax.persistence</groupId>
-			<artifactId>hibernate-jpa-2.1-api</artifactId>
+			<groupId>javax.persistence</groupId>
+			<artifactId>javax.persistence-api</artifactId>
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>
