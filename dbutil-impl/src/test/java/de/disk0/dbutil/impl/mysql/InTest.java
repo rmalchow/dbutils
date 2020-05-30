@@ -23,8 +23,7 @@ public class InTest extends TestBase {
 
 	@Test
 	public void testSetNullExpectNull() throws SqlException {
-		HundRepository hr = new HundRepository();
-		hr.setDataSource(dataSource);
+		HundRepository hr = new HundRepository(dataSource);
 
 		for(String s : new String[] { "a", "b", "c", "d", "e", "f", "g" } ) {
 			Hund h = new Hund();

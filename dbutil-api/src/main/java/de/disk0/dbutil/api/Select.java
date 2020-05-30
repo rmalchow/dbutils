@@ -41,7 +41,7 @@ public interface Select {
 	void order(Field reference, boolean ascending);
 
 	String getSql();
-	
+
 	Map<String,Object> getParams();
 
 	String getAlias();

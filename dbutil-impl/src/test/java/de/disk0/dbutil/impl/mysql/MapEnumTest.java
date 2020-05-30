@@ -20,8 +20,7 @@ public class MapEnumTest extends TestBase {
 
 	@Test
 	public void testSetNullExpectNull() throws SqlException {
-		KatzeRepository hr = new KatzeRepository();
-		hr.setDataSource(dataSource);
+		KatzeRepository hr = new KatzeRepository(dataSource);
 		Katze k = new Katze();
 		k = hr.save(k);
 		Assert.assertNotNull(k);

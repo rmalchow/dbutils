@@ -9,12 +9,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -28,10 +26,9 @@ public abstract class AbstractMappingRepository<T> implements RowMapper<T> {
 	
 	private static Log log = LogFactory.getLog(AbstractMappingRepository.class);
 
-	@Autowired
-	protected DataSource dataSource;
+	protected final DataSource dataSource;
 
-	protected ParsedEntity<T> parsedEntity;
+	protected final ParsedEntity<T> parsedEntity;
 	
 	protected Class<T> clazz;
 	
@@ -47,22 +44,24 @@ public abstract class AbstractMappingRepository<T> implements RowMapper<T> {
 		return clazz;
 	}
 
-	@PostConstruct
-	public ParsedEntity<T> getParsedEntity() {
-		if(parsedEntity==null) {
-			try {
-				parsedEntity = new ParsedEntity<>(getClazz()); 
-				if(parsedEntity.getTableName()==null) {
-					throw new InvalidParameterException("entity "+getClazz()+" has no table");
-				}
-				if(parsedEntity.getColumns().size()==0) {
-					throw new InvalidParameterException("entity "+getClazz()+" has no columns");
-				}
-			} catch (Exception e) {
-				log.error("unable to parse entity: "+getClazz()+"! ",e);
-				throw e;
+	public AbstractMappingRepository(DataSource dataSource) {
+		this.dataSource = dataSource;
+		
+		try {
+			parsedEntity = new ParsedEntity<>(getClazz());
+			if(parsedEntity.getTableName()==null) {
+				throw new InvalidParameterException("entity "+getClazz()+" has no table");
 			}
+			if(parsedEntity.getColumns().size()==0) {
+				throw new InvalidParameterException("entity "+getClazz()+" has no columns");
+			}
+		} catch (Exception e) {
+			log.error("unable to parse entity: "+getClazz()+"! ",e);
+			throw e;
 		}
+	}
+	
+	public ParsedEntity<T> getParsedEntity() {
 		return parsedEntity;
 	}
 	
@@ -79,7 +78,6 @@ public abstract class AbstractMappingRepository<T> implements RowMapper<T> {
 	@Override
 	public T mapRow(ResultSet rs, int c) throws SQLException {
 		try {
-
 			if(applicableColumns==null) {
 				synchronized (this) {
 					applicableColumns = new ArrayList<>();
@@ -117,7 +115,7 @@ public abstract class AbstractMappingRepository<T> implements RowMapper<T> {
 	
 	public List<T> find(String sql, Map<String,Object> params) throws SqlException {
 		try {
-			NamedParameterJdbcTemplate t = new NamedParameterJdbcTemplate(getDataSource());
+			NamedParameterJdbcTemplate t = getTemplate();
 			long start = System.currentTimeMillis();
 			log.debug("-------- query: "+sql+" / "+params);
 			List<T> out = t.query(sql, params, this);
@@ -152,7 +150,7 @@ public abstract class AbstractMappingRepository<T> implements RowMapper<T> {
 	
 	public void delete(String sql, Map<String,Object> params) throws SqlException {
 		try {
-			NamedParameterJdbcTemplate templ = new NamedParameterJdbcTemplate(getDataSource());
+			NamedParameterJdbcTemplate templ = getTemplate();
 			log.debug("-------- update: "+sql+" / "+params);
 			templ.update(sql, params);
 		} catch (Exception e) {
@@ -163,7 +161,7 @@ public abstract class AbstractMappingRepository<T> implements RowMapper<T> {
 	
 	public void update(String sql, Map<String,Object> params) throws SqlException {
 		try {
-			NamedParameterJdbcTemplate templ = new NamedParameterJdbcTemplate(getDataSource());
+			NamedParameterJdbcTemplate templ = getTemplate();
 			log.debug("-------- update: "+sql+" / "+params);
 			templ.update(sql, params);
 		} catch (Exception e) {
@@ -171,7 +169,6 @@ public abstract class AbstractMappingRepository<T> implements RowMapper<T> {
 			throw new SqlException("SQL.REPO.DELETE_FAILED",new Object[] { e.getMessage() },  e);
 		}
 	}
-	
 	
 	public NamedParameterJdbcTemplate getTemplate() {
 		if(template==null) {
@@ -183,8 +180,5 @@ public abstract class AbstractMappingRepository<T> implements RowMapper<T> {
 	public DataSource getDataSource() {
 		return dataSource;
 	}
-
-	public void setDataSource(DataSource dataSource) {
-		this.dataSource = dataSource;
-	}	
+	
 }

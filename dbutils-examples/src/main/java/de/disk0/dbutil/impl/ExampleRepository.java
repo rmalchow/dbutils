@@ -15,7 +15,13 @@ import de.disk0.dbutil.api.TableReference;
 import de.disk0.dbutil.api.exceptions.SqlException;
 import de.disk0.dbutil.impl.mysql.MysqlStatementBuilder;
 
+import javax.sql.DataSource;
+
 public class ExampleRepository extends AbstractGuidRepository<ExampleEntity> {
+
+	public ExampleRepository(DataSource dataSource) {
+		super(dataSource);
+	}
 	
 	// this class already inherits a bunch of methods from above:
 	// get, save, save(with specific id), find(sql,params), delete()

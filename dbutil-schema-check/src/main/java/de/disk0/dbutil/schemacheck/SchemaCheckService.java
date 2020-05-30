@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.sql.DataSource;
-import javax.xml.bind.DatatypeConverter;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -24,8 +23,10 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 
 @Service
 public class SchemaCheckService {
-	
-	private static Log log = LogFactory.getLog(SchemaCheckService.class);
+
+	private static final char[] DIGITS_UPPER = "0123456789ABCDEF".toCharArray();
+
+	private static final Log log = LogFactory.getLog(SchemaCheckService.class);
 	
 	@Autowired
 	private DataSource dataSource;
@@ -35,7 +36,7 @@ public class SchemaCheckService {
 		List<Table> tables = new ArrayList<>();
 		try {
 			NamedParameterJdbcTemplate templ = new NamedParameterJdbcTemplate(dataSource);
-			String dbName = templ.queryForObject("SELECT DATABASE()", new HashMap<String,Object>(), String.class);
+			String dbName = templ.queryForObject("SELECT DATABASE()", new HashMap<>(), String.class);
 			Map<String,String> p = new HashMap<>();
 			p.put("dbName", dbName);
 			
@@ -48,8 +49,7 @@ public class SchemaCheckService {
 				t.setKeys(templ.query("show columns from :tableName", p, new KeyRowMapper()));
 				tables.add(t);
 			}
-			
-			
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -59,12 +59,23 @@ public class SchemaCheckService {
 			MessageDigest md = MessageDigest.getInstance("MD5");
 		    md.update(s.getBytes());
 		    byte[] digest = md.digest();
-		    String myHash = DatatypeConverter.printHexBinary(digest).toUpperCase();
+		    String myHash = encodeHex(digest);
 			log.info(" ---> DB state: "+myHash);
 		} catch (Exception e) {
 			log.error("error checking db state: ",e);
 		}
 		
+	}
+
+	protected String encodeHex(final byte[] data) {
+		final int l = data.length;
+		final char[] out = new char[l << 1];
+
+		for (int i = 0, j = 0; i < l; i++) {
+			out[j++] = DIGITS_UPPER[(0xF0 & data[i]) >>> 4];
+			out[j++] = DIGITS_UPPER[0x0F & data[i]];
+		}
+		return new String(out);
 	}
 
 	public class KeyRowMapper implements RowMapper<Key> {
@@ -84,7 +95,5 @@ public class SchemaCheckService {
 		}
 		
 	}
-	
-	
 
 }

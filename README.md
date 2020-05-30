@@ -332,5 +332,7 @@ public class FooRepository {
 }
 ```
 
+### Compatibility
+Supports Spring Boot 2.0.x - Spring Boot 2.3.x.
 
-
+Java 8 - Java 14.
