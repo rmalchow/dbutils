@@ -5,8 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
-
 import de.disk0.dbutil.api.Comparator;
 import de.disk0.dbutil.api.Condition;
 import de.disk0.dbutil.api.Field;
@@ -71,15 +69,15 @@ public class MysqlInsert implements Insert {
 				fs.add(p.getLeft().getSql());
 				vs.add(p.getRight().getSql());
 			}
-			parts.add("(" + StringUtils.join(fs, ", ") + ")");
+			parts.add("(" + String.join(", ", fs) + ")");
 			parts.add("VALUES");
-			parts.add("(" + StringUtils.join(vs, ", ") + ")");
+			parts.add("(" + String.join(", ", vs) + ")");
 		}
 		if (wc != null) {
 			parts.add(wc.getSql());
 		}
 
-		return StringUtils.join(parts, " ");
+		return String.join(" ", parts);
 	}
 
 	@Override

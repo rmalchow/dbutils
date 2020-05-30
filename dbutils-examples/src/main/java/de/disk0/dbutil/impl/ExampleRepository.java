@@ -4,8 +4,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
-
 import de.disk0.dbutil.api.Aggregate;
 import de.disk0.dbutil.api.Comparator;
 import de.disk0.dbutil.api.Condition;
@@ -36,17 +34,17 @@ public class ExampleRepository extends AbstractGuidRepository<ExampleEntity> {
 	
 	public List<ExampleEntity> find(String parentId, List<String> names, String search, String userId, int offset, int max) throws SqlException {
 		Select s = new MysqlStatementBuilder().createSelect();
-		
+
 		TableReference trEx = s.fromTable("example");
-		
-		if(!StringUtils.isEmpty(parentId)) {
+
+		if(parentId != null && parentId.length() > 0) {
 			s.condition(Operator.AND,trEx.field("parent_id"),Comparator.EQ,trEx.value(parentId));
 		}
-		
+
 		if(names!=null && names.size()>0) {
 			// this should be an OR, so first we create a nested condition:
 			Condition c = s.condition(Operator.AND);
-			
+
 			// and inside, we add the ORed names:
 			for(String n : names) {
 				c.condition(Operator.OR, trEx.field(Aggregate.UPPER, trEx.field("name")), Comparator.EQ, trEx.value(n.toUpperCase()));

@@ -7,8 +7,6 @@ import java.util.Map;
 
 import javax.persistence.Table;
 
-import org.apache.commons.lang3.StringUtils;
-
 import de.disk0.dbutil.api.Aggregate;
 import de.disk0.dbutil.api.Field;
 import de.disk0.dbutil.api.JoinTable;
@@ -56,7 +54,7 @@ public class MysqlTableReferenceSimple implements TableReference {
 			for(TableReference r : refs) {
 				rSql.add(r.getSql());
 			}
-			sb.append(StringUtils.join(rSql.toArray()," "));
+			sb.append(String.join(" ", rSql));
 		}
 		return sb.toString();
 	}

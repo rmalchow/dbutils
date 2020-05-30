@@ -5,8 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
-
 import de.disk0.dbutil.api.Aggregate;
 import de.disk0.dbutil.api.Field;
 import de.disk0.dbutil.api.TableReference;
@@ -67,7 +65,7 @@ public class MysqlField implements Field {
 			}
 		}
 
-		String t = StringUtils.join(parts,", ");
+		String t = String.join(", ", parts);
 		
 		List<String> parts2 = new ArrayList<>();
 		
@@ -98,7 +96,7 @@ public class MysqlField implements Field {
 			
 		}
 
-		return StringUtils.join(parts2," ");
+		return String.join(" ", parts2);
 		
 	}
 	

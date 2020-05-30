@@ -7,15 +7,12 @@ import java.util.Map;
 
 import javax.persistence.Table;
 
-import org.apache.commons.lang3.StringUtils;
-
 import de.disk0.dbutil.api.Aggregate;
 import de.disk0.dbutil.api.Comparator;
 import de.disk0.dbutil.api.Condition;
 import de.disk0.dbutil.api.Field;
 import de.disk0.dbutil.api.Operator;
 import de.disk0.dbutil.api.Select;
-import de.disk0.dbutil.api.SelectExpression;
 import de.disk0.dbutil.api.SubSelect;
 import de.disk0.dbutil.api.TableReference;
 import de.disk0.dbutil.api.entities.BaseEntity;
@@ -54,7 +51,7 @@ public class MysqlTableReferenceSubSelect extends MysqlTableReferenceSimple impl
 				cs.add(r.getSql());
 			}
 		}
-		return StringUtils.join(cs.toArray()," ");
+		return String.join(" ", cs);
 	}
 
 	@Override

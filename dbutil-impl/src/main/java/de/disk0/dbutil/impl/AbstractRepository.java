@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -75,7 +74,7 @@ public abstract class AbstractRepository<T extends BaseEntity<S>,S> extends Abst
 				columns.add("`"+pc.getColumnName()+"`");
 				values.add(":"+pc.getColumnName());
 			}
-			insertOneStatement = "INSERT INTO `"+pe.getTableName()+"` ("+(StringUtils.join(columns,", "))+") VALUES ("+(StringUtils.join(values,", "))+")";
+			insertOneStatement = "INSERT INTO `"+pe.getTableName()+"` ("+(String.join(", ", columns))+") VALUES ("+(String.join(", ", values))+")";
 		}
 		return insertOneStatement; 
 	}
@@ -87,7 +86,7 @@ public abstract class AbstractRepository<T extends BaseEntity<S>,S> extends Abst
 			for(ParsedColumn pc : pe.getColumns()) {
 				columns.add("`"+pc.getColumnName()+"`=:"+pc.getColumnName());
 			}
-			updateOneStatement = "UPDATE `"+pe.getTableName()+"` SET "+(StringUtils.join(columns,", "))+" WHERE `"+pe.getIdColumn()+"`=:id";
+			updateOneStatement = "UPDATE `"+pe.getTableName()+"` SET "+(String.join(", ", columns))+" WHERE `"+pe.getIdColumn()+"`=:id";
 		}
 		return updateOneStatement; 
 	}
