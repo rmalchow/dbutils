@@ -4,8 +4,8 @@ import java.util.Map;
 
 public interface SelectExpression {
 
-	public String getSql();
+	String getSql();
 	
-	public Map<String,Object> getParams();
+	Map<String,Object> getParams();
 
 }

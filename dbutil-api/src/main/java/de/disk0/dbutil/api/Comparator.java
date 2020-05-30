@@ -16,7 +16,7 @@ public enum Comparator {
 
 	private String symbol;
 	
-	private Comparator(String symbol) {
+	Comparator(String symbol) {
 		this.setSymbol(symbol);
 	}
 
@@ -27,6 +27,5 @@ public enum Comparator {
 	public void setSymbol(String symbol) {
 		this.symbol = symbol;
 	}
-	
-	
+
 }

@@ -25,6 +25,14 @@
 		<java.version>1.8</java.version>
 	</properties>
 
+	<dependencies>
+		<dependency>
+			<groupId>org.hibernate.javax.persistence</groupId>
+			<artifactId>hibernate-jpa-2.1-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
+
 	<build>
 		<plugins>
 			<plugin>
