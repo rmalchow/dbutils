@@ -23,7 +23,9 @@ public class MapNullTest extends TestBase {
 
 	@Test
 	public void testSetNullExpectNull() throws SqlException {
-		HundRepository hr = new HundRepository(dataSource);
+		HundRepository hr = new HundRepository();
+		hr.setDataSource(dataSource);
+
 		Hund h = new Hund();
 		h = hr.save(h);
 		Assert.assertNotNull(h);
@@ -38,7 +40,9 @@ public class MapNullTest extends TestBase {
 	
 	@Test
 	public void testNullableFields() throws SqlException {
-		PetRepository pr = new PetRepository(dataSource);
+		PetRepository pr = new PetRepository();
+		pr.setDataSource(dataSource);
+		
 		Pet p = new Pet();
 		
 		String id = pr.save(p).getId();
@@ -51,7 +55,9 @@ public class MapNullTest extends TestBase {
 
 	@Test
 	public void testNonNullableFields() throws SqlException, SQLException {
-		PetRepository pr = new PetRepository(dataSource);
+		PetRepository pr = new PetRepository();
+		pr.setDataSource(dataSource);
+		
 		Pet p = new Pet();
 		
 		String id = pr.save(p).getId();

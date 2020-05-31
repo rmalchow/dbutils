@@ -20,7 +20,8 @@ public class MapBigDecimalTest extends TestBase {
 
 	@Test
 	public void testSetNullExpectNull() throws SqlException {
-		BigDecimalEntityRepository r = new BigDecimalEntityRepository(dataSource);
+		BigDecimalEntityRepository r = new BigDecimalEntityRepository();
+		r.setDataSource(dataSource);
 
 		BigDecimalEntity bde = new BigDecimalEntity();
 		BigDecimalEntity bde2 = null;

@@ -14,8 +14,6 @@ import de.disk0.dbutil.api.exceptions.SqlException;
 import de.disk0.dbutil.impl.util.ParsedEntity;
 import de.disk0.dbutil.impl.util.ParsedEntity.ParsedColumn;
 
-import javax.sql.DataSource;
-
 
 public abstract class AbstractRepository<T extends BaseEntity<S>,S> extends AbstractMappingRepository<T> {
 
@@ -26,10 +24,6 @@ public abstract class AbstractRepository<T extends BaseEntity<S>,S> extends Abst
 	private String insertOneStatement;
 	private String updateOneStatement;
 	private String deleteOneStatement;
-
-	public AbstractRepository(DataSource dataSource) {
-		super(dataSource);
-	}
 
 	protected String getFindOneStatement() {
 		if(findOneStatement == null) {

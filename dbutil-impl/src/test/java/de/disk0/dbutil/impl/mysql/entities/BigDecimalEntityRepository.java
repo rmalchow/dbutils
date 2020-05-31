@@ -6,8 +6,5 @@ import javax.sql.DataSource;
 
 public class BigDecimalEntityRepository extends AbstractGuidRepository<BigDecimalEntity> {
 
-    public BigDecimalEntityRepository(DataSource dataSource) {
-        super(dataSource);
-    }
 
 }

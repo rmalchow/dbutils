@@ -6,8 +6,5 @@ import javax.sql.DataSource;
 
 public class PetRepository extends AbstractGuidRepository<Pet> {
 
-    public PetRepository(DataSource dataSource) {
-        super(dataSource);
-    }
 
 }

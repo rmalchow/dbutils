@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.NonUniqueResultException;
 import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
@@ -18,7 +19,6 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
-import de.disk0.dbutil.api.exceptions.NonUniqueResultException;
 import de.disk0.dbutil.api.exceptions.SqlException;
 import de.disk0.dbutil.impl.util.ParsedEntity;
 import de.disk0.dbutil.impl.util.ParsedEntity.ParsedColumn;
@@ -178,6 +178,10 @@ public abstract class AbstractMappingRepository<T> implements RowMapper<T> {
 
 	public DataSource getDataSource() {
 		return dataSource;
+	}
+
+	public void setDataSource(DataSource dataSource) {
+		this.dataSource = dataSource;
 	}
 	
 }
