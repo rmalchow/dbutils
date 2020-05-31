@@ -7,8 +7,6 @@ import java.util.Map;
 
 import javax.persistence.Table;
 
-import org.apache.commons.lang3.StringUtils;
-
 import de.disk0.dbutil.api.Aggregate;
 import de.disk0.dbutil.api.Comparator;
 import de.disk0.dbutil.api.Condition;
@@ -164,7 +162,7 @@ public class MysqlSelect implements Select {
 		for(SqlFragment f : fragments) {
 			x.add(f.getSql());
 		}
-		return StringUtils.join(x,joinWith);
+		return String.join(joinWith, x);
 	}
 	
 	
@@ -208,7 +206,7 @@ public class MysqlSelect implements Select {
 			parts.add(max+"");
 		}
 		
-		String out = StringUtils.join(parts," "); 
+		String out = String.join(" ", parts); 
 		
 		if(unions.size()>0) {
 			parts.clear();
@@ -216,7 +214,7 @@ public class MysqlSelect implements Select {
 			for(Select s : unions) {
 				parts.add("("+s.getSql()+")");
 			}
-			out = StringUtils.join(parts, " UNION ");
+			out = String.join(" UNION ", parts);
 		}
 		
 		return out;

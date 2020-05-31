@@ -11,10 +11,16 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import de.disk0.dbutil.api.entities.BaseGuidEntity;
 import de.disk0.dbutil.api.exceptions.SqlException;
 
+import javax.sql.DataSource;
+
 
 public abstract class AbstractGuidRepository<T extends BaseGuidEntity> extends AbstractRepository<T,String> implements RowMapper<T> {
 
 	private static Log log = LogFactory.getLog(AbstractGuidRepository.class);
+
+	public AbstractGuidRepository(DataSource dataSource) {
+		super(dataSource);
+	}
 	
 	public void delete(String id) throws SqlException {
 		T t = get(id);

@@ -5,8 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
-
 import de.disk0.dbutil.api.Comparator;
 import de.disk0.dbutil.api.Condition;
 import de.disk0.dbutil.api.Field;
@@ -48,7 +46,7 @@ public class MysqlTableReferenceJoinTable extends MysqlTableReferenceSimple impl
 				cs.add(r.getSql());
 			}
 		}
-		return StringUtils.join(cs.toArray()," ");
+		return String.join(" ", cs);
 	}
 
 	@Override

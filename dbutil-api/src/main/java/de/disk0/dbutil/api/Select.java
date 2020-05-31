@@ -6,46 +6,44 @@ import de.disk0.dbutil.api.entities.BaseEntity;
 
 public interface Select {
 
-	
 	//@Deprecated
-	public Field addSelect(Object value, String alias);
+	Field addSelect(Object value, String alias);
 	//@Deprecated
-	public Field addSelect(TableReference tableReference, String field, String alias);
+	Field addSelect(TableReference tableReference, String field, String alias);
 	//@Deprecated
-	public Field addSelect(Aggregate a, TableReference tableReference, String field, String alias);
-	public Field addSelect(Aggregate a, String alias, Field... references);
-	public Field addSelect(Field fr, String alias);
+	Field addSelect(Aggregate a, TableReference tableReference, String field, String alias);
+	Field addSelect(Aggregate a, String alias, Field... references);
+	Field addSelect(Field fr, String alias);
 
-	public TableReference fromTable(String table);
-	public TableReference fromTable(Class<? extends BaseEntity<?>> table);
-	public SubSelect from();
-	public Select union();
-
-	//@Deprecated
-	public Condition condition(Operator op, TableReference table1, String field1, Comparator c, TableReference table2, String field2);
-	//@Deprecated
-	public Condition condition(Operator op, TableReference table1, String field1, Comparator c, Object value);
-
-	public Condition condition(Operator op);
-	public Condition condition(Operator op, Field fr1, Comparator c, Field fr2);
-	public Condition isNull(Operator op, Field fr1);
-	public Condition isNotNull(Operator op, Field fr1);
-
-	public void limit(int offset, int max);
+	TableReference fromTable(String table);
+	TableReference fromTable(Class<? extends BaseEntity<?>> table);
+	SubSelect from();
+	Select union();
 
 	//@Deprecated
-	public void group(TableReference table, String field);
+	Condition condition(Operator op, TableReference table1, String field1, Comparator c, TableReference table2, String field2);
 	//@Deprecated
-	public void order(TableReference table, String field, boolean ascending);
+	Condition condition(Operator op, TableReference table1, String field1, Comparator c, Object value);
 
-	public void group(Field reference);
-	public void order(Field reference, boolean ascending);
+	Condition condition(Operator op);
+	Condition condition(Operator op, Field fr1, Comparator c, Field fr2);
+	Condition isNull(Operator op, Field fr1);
+	Condition isNotNull(Operator op, Field fr1);
 
-	public String getSql();
-	
-	public Map<String,Object> getParams();
+	void limit(int offset, int max);
 
-	public String getAlias();
+	//@Deprecated
+	void group(TableReference table, String field);
+	//@Deprecated
+	void order(TableReference table, String field, boolean ascending);
 
+	void group(Field reference);
+	void order(Field reference, boolean ascending);
+
+	String getSql();
+
+	Map<String,Object> getParams();
+
+	String getAlias();
 
 }

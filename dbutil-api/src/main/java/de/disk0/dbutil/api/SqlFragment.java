@@ -4,7 +4,7 @@ import java.util.Map;
 
 public interface SqlFragment {
 
-	public String getSql();
-	public Map<String, Object> getParams();
+	String getSql();
+	Map<String, Object> getParams();
 	
 }
