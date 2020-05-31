@@ -13,6 +13,7 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -26,9 +27,10 @@ public abstract class AbstractMappingRepository<T> implements RowMapper<T> {
 	
 	private static Log log = LogFactory.getLog(AbstractMappingRepository.class);
 
-	protected final DataSource dataSource;
+	@Autowired
+	protected DataSource dataSource;
 
-	protected final ParsedEntity<T> parsedEntity;
+	protected ParsedEntity<T> pe;
 	
 	protected Class<T> clazz;
 	
@@ -43,26 +45,23 @@ public abstract class AbstractMappingRepository<T> implements RowMapper<T> {
 		}
 		return clazz;
 	}
-
-	public AbstractMappingRepository(DataSource dataSource) {
-		this.dataSource = dataSource;
-		
-		try {
-			parsedEntity = new ParsedEntity<>(getClazz());
-			if(parsedEntity.getTableName()==null) {
-				throw new InvalidParameterException("entity "+getClazz()+" has no table");
-			}
-			if(parsedEntity.getColumns().size()==0) {
-				throw new InvalidParameterException("entity "+getClazz()+" has no columns");
-			}
-		} catch (Exception e) {
-			log.error("unable to parse entity: "+getClazz()+"! ",e);
-			throw e;
-		}
-	}
 	
 	public ParsedEntity<T> getParsedEntity() {
-		return parsedEntity;
+		if(pe==null) {
+			try {
+				pe = new ParsedEntity<>(getClazz());
+				if(pe.getTableName()==null) {
+					throw new InvalidParameterException("entity "+getClazz()+" has no table");
+				}
+				if(pe.getColumns().size()==0) {
+					throw new InvalidParameterException("entity "+getClazz()+" has no columns");
+				}
+			} catch (Exception e) {
+				log.error("unable to parse entity: "+getClazz()+"! ",e);
+				throw e;
+			}
+		}
+		return pe;
 	}
 	
 	@SuppressWarnings("rawtypes")
