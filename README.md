@@ -1,14 +1,79 @@
-## dbutils
+# dbutils
 
 this is an attempt at a object-relational mapper and query builder that uses JPA annotations without the need of any compile time shenanigans and with mostly reasonable defaults.
 
+i have been using (and improving) it for quite a while now, and found it useful in many cases. if you use it, and find it useful too, that's even better.
+
+
+
 ### why bother?
 
-i started this mostly out of lazyness. i didn't want the complexity of full blown JPA criteria, and i also wanted less magic than what spring data repositories do. for me, this library is a good balance between simplicity and minimizing boilerplate code. basically, once the entity is defined, the only thing i have to deal with the code to find specific entries (more on the pattern i use below).
+i started this mostly out of lazyness. i didn't want the complexity of full blown JPA criteria, and i also wanted less runtim magic than what spring data repositories do. for me, this library is a good balance between simplicity and minimizing boilerplate code. basically, once the entity is defined, the only thing i have to deal with the code to find specific entries (more on the pattern i use below).
 
 this uses `java.sql.DataSource` and `NamedParameterJdbcTemplate` from spring-jdbc, the annotations from `javax.persistence`, and plain reflection to do the actual mapping. it can currently map most standard field types (including enums).
 
-### i have been using (and improving) it for quite a while now, and found it useful in many cases. if you use it, and find it useful too, that's even better.
+it also offers pretty extensive and direct control over the SQL that is produced.
+
+
+
+### thanks
+
+big thanks to everyone who has contributed to this, especially @mdjimy
+
+
+
+### compatibility
+
+Supports Spring Boot 2.0.x - Spring Boot 2.3.x.
+
+Java 8 - Java 14. 
+
+
+
+### dependencies
+
+this has very few dependencies - and thanks to @mdjimy, there are even less from > 0.52. the few things you DO need are as these:
+
+since the JPA APIs are a big mess, packaging wise, and we only really need a handful of annotations from there, `javax-persinstence` , it is now set to "provided" - so you will have to pick your poison. i normally use:
+
+```xml
+<dependency>
+	<groupId>javax.persistence</groupId>
+    <artifactId>javax.persistence-api</artifactId>
+	<version>2.2</version>
+</dependency>
+```
+
+in places where you want to do annotations or extend some of the base classes, but not actually pull in any implementations, you can do:
+
+```xml
+<dependency>
+    <groupId>de.disk0.dbutil</groupId>
+    <artifactId>dbutil-api</artifactId>
+</dependency>
+```
+
+and then, where you actually need the statement builder implementation:
+
+```xml
+<dependency>
+    <groupId>de.disk0.dbutil</groupId>
+    <artifactId>dbutil-impl</artifactId>
+</dependency>
+```
+
+
+---
+
+don't forget to also pull in your JDBC and configure springboot to make a DataSource available
+
+---
+
+
+
+# Components
+
+
 
 ### basic mapping
 
@@ -33,11 +98,13 @@ public class Foo extends BaseGuidEntity {
 
 	/**
 	any getters and setters you want. dbutils modifies the fields directly 
-	through reflection, so this can really be anything you want
+	through reflection, so this can really be anything
 	**/
 	
 }
 ```
+
+
 
 ### repository
 
@@ -53,7 +120,7 @@ public FooRepository extends AbstractGuidRepository<Foo> {
 
 if you're using this from within springboot, this already has an `@Autowired` `DataSource` , otherwise you may have to instantiate a DataSource and wire it yourself.
 
-this also comes with basic functionality, such as:
+this comes with basic functionality, such as:
 
 ```java
 public T get(String id) 
@@ -97,6 +164,22 @@ params.put("updated", new Date());
 List<Foo> foos = r.find("SELECT FROM foo WHERE update < :updated", params);
 
 ```
+
+
+
+### simplequery
+
+if you find yourself in a situation where you just want a simple SQL statement with one or two params, an you're too lazy to use the full query builder (below), you can use the "SimpleQuery" class:
+
+```java
+SimpleQery sq = new SimpleQuery("SELECT * FROM x WHERE foo = :foo"); // placeholder 'foo'
+sq.puf("foo", "bar"); // provider a value for the placeholder
+return r.find(sq.getQuery(),sq.getParams());
+```
+
+how is that for an SQL-injection-proof load in three lines? 
+
+
 
 ### querybuilder
 
@@ -218,11 +301,15 @@ WHERE
 	)
 ```
 
-### useful patterns
+
+
+# useful patterns (maybe)
 
 i am usually using this for things that involve REST APIs, and for this, i found the following pattern useful:
 
-##### Controller 
+
+
+### Controller 
 
 a spring `@RestController` only serves as HTTP -> Service translation. for listing, i usually have a few common fields (such as "filter" for searching, applied to all fields that make sense, along with "order", "asc", "offset" and "max"). POST / PUT / DELETE and single GET methods are more or less self-explanatory, a list get would usually look something like this:
 
@@ -253,7 +340,9 @@ public class FooController {
 }
 ```
 
-##### Service
+
+
+### Service
 
 deals with any kind of business logic, and especially authorization (if applicable). again, the simple CRUD methods are trivial, listing could be:
 
@@ -280,7 +369,9 @@ public class FooService {
     }
 }
 ```
-##### Repository
+
+
+### Repository
 
 this deals with building the appropriate SQL and loading the object. The important distinctions here is that
 
@@ -296,24 +387,57 @@ public class FooRepository {
 		TableReference tr = s.fromTable(Foo.class);
 
 		if(parentId!=null) {
-			s.condition(Operator.AND, tr.field("parent_id"),Comparator.EQ,tr.value(parentId));
+			s.condition(
+                Operator.AND, 
+                tr.field("parent_id"),
+                Comparator.EQ,
+                tr.value(parentId)
+            );
 		}
 		
 		if(before==null && after==null) {
 			// nothing
 		} else if (before == null) {
-			s.condition(Operator.AND, tr.field("updated"), Comparator.GTE, tr.value(after));
+			s.condition(
+                Operator.AND, 
+                tr.field("updated"), 
+                Comparator.GTE, tr.value(after)
+            );
 		} else if (after == null) {
-			s.condition(Operator.AND, tr.field("updated"), Comparator.LTE, tr.value(before));
+			s.condition(
+                Operator.AND, 
+                tr.field("updated"), 
+                Comparator.LTE, 
+                tr.value(before)
+            );
 		} else if (after.before(before)) {
 			// BETWEEN
-			s.condition(Operator.AND, tr.field("updated"),Comparator.GTE, tr.value(after));
-			s.condition(Operator.AND, tr.field("updated"),Comparator.LTE, tr.value(before));
+			s.condition(
+                Operator.AND, 
+                tr.field("updated"),
+                Comparator.GTE, tr.value(after)
+            );
+			s.condition(
+                Operator.AND, 
+                tr.field("updated"),
+                Comparator.LTE, 
+                tr.value(before)
+            );
 		} else {
 			// before a OR after b
 			Condition c = s.condition(Operator.AND);
-			c.condition(Operator.OR, tr.field("updated"),Comparator.GTE, tr.value(after));
-			c.condition(Operator.OR, tr.field("updated"),Comparator.LTE, tr.value(before));
+			c.condition(
+                Operator.OR, 
+                tr.field("updated"),
+                Comparator.GTE,
+                tr.value(after)
+            );
+			c.condition(
+                Operator.OR, 
+                tr.field("updated"),
+                Comparator.LTE, 
+                tr.value(before)
+            );
 		}
 
 		s.order(tr.field(order), asc);
@@ -324,7 +448,10 @@ public class FooRepository {
 
 	}
 
-	public List<Foo> list(String parentId, Date before, Date after, String filter, String order, boolean asc, int offset, int max) throws SqlException {
+	public List<Foo> list(
+        String parentId, Date before, Date after, String filter, 
+        String order, boolean asc, int offset, int max
+    ) throws SqlException {
 		Select s = createSelect(parentId,before,after,filter,order,asc,offset,max);
 		return find(s.getSql(),s.getParams());
 	}
@@ -332,7 +459,4 @@ public class FooRepository {
 }
 ```
 
-### Compatibility
-Supports Spring Boot 2.0.x - Spring Boot 2.3.x.
 
-Java 8 - Java 14.
