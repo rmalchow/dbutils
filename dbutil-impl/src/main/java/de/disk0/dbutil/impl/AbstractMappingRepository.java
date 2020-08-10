@@ -20,6 +20,8 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 import de.disk0.dbutil.api.exceptions.SqlException;
+import de.disk0.dbutil.impl.util.DbTemplate;
+import de.disk0.dbutil.impl.util.DbTemplateHolder;
 import de.disk0.dbutil.impl.util.ParsedEntity;
 import de.disk0.dbutil.impl.util.ParsedEntity.ParsedColumn;
 
@@ -170,6 +172,10 @@ public abstract class AbstractMappingRepository<T> implements RowMapper<T> {
 	}
 	
 	public NamedParameterJdbcTemplate getTemplate() {
+		DbTemplate dt = DbTemplateHolder.get();
+		if(dt != null) {
+			return dt.getTemplate(getDataSource());
+		}
 		if(template==null) {
 			template = new NamedParameterJdbcTemplate(getDataSource());
 		}
