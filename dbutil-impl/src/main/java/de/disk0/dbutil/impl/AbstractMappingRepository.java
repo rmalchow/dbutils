@@ -19,6 +19,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
+import de.disk0.dbutil.api.Select;
 import de.disk0.dbutil.api.exceptions.SqlException;
 import de.disk0.dbutil.impl.util.DbTemplate;
 import de.disk0.dbutil.impl.util.DbTemplateHolder;
@@ -113,6 +114,14 @@ public abstract class AbstractMappingRepository<T> implements RowMapper<T> {
 			throw new SQLException("failed to map entity ("+e.getMessage()+")",e);
 		}
 	}
+
+	public List<T> find(SimpleQuery q) throws SqlException {
+		return find(q.getQuery(),q.getParams());
+	}
+	
+	public List<T> find(Select s) throws SqlException {
+		return find(s.getSql(),s.getParams());
+	}
 	
 	public List<T> find(String sql, Map<String,Object> params) throws SqlException {
 		try {
@@ -128,6 +137,14 @@ public abstract class AbstractMappingRepository<T> implements RowMapper<T> {
 		}
 	}
 
+	public T findOne(SimpleQuery q) throws SqlException {
+		return findOne(q.getQuery(),q.getParams());
+	}
+	
+	public T findOne(Select s) throws SqlException {
+		return findOne(s.getSql(),s.getParams());
+	}
+	
 	protected T findOne(String sql, Map<String,Object> params) throws SqlException {
 		try {
 			List<T> out = find(sql, params);
