@@ -19,7 +19,7 @@ public abstract class AbstractGuidRepository<T extends BaseGuidEntity> extends A
 
 	private IdGenerator idGenerator;
 	
-	 public void setIDGenerator(IdGenerator idGenerator) {
+	 public void setIdGenerator(IdGenerator idGenerator) {
 	        assert idGenerator != null;
 	        this.idGenerator = idGenerator;
 	 }
