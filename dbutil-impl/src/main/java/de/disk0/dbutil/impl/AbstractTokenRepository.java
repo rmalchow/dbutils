@@ -53,7 +53,7 @@ public abstract class AbstractTokenRepository<T extends BaseGuidEntity> extends 
 	}
 	
 	public T save(T t) throws SqlException {
-		return save(t,UUID.randomUUID().toString());
+		return save(t,generateToken());
 	}
 	
 	public T save(T t, String uuid) throws SqlException {
