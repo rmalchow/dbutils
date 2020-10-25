@@ -14,71 +14,44 @@ import de.disk0.dbutil.api.entities.BaseGuidEntity;
 import de.disk0.dbutil.api.exceptions.SqlException;
 
 
-public abstract class AbstractGuidRepository<T extends BaseGuidEntity> extends AbstractRepository<T,String> implements RowMapper<T> {
+public abstract class AbstractTokenRepository<T extends BaseGuidEntity> extends AbstractRepository<T,String> implements RowMapper<T> {
 
-	private static Log log = LogFactory.getLog(AbstractGuidRepository.class);
-	private static char[] hex      = new char[] { '0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'}; 
+	private static Log log = LogFactory.getLog(AbstractTokenRepository.class);
 	private static SplittableRandom sr = new SplittableRandom();
-
-	private static String generateUUID() {
-		/**
-		return UUID.randomUUID().toString();
-		 **/
-		char[] x = new char[36];
-		int l=0;
-		l=sr.nextInt();
-		// 8-block
-		x[0] = (char)hex[l>>0  &0xF];
-		x[1] = (char)hex[l>>4  &0xF];
-		x[2] = (char)hex[l>>8  &0xF];
-		x[3] = (char)hex[l>>12 &0xF];
-		x[4] = (char)hex[l>>16 &0xF];
-		x[5] = (char)hex[l>>20 &0xF];
-		x[6] = (char)hex[l>>24 &0xF];
-		x[7] = (char)hex[l>>28 &0xF];
-		x[8] = '-';
-		l=sr.nextInt();
-		// 4-block
-		x[9] = (char)hex[l>>0  &0xF];
-		x[10]= (char)hex[l>>4  &0xF];
-		x[11]= (char)hex[l>>8  &0xF];
-		x[12]= (char)hex[l>>12 &0xF];
-		x[13] = '-';
-		// 4-block
-		x[14]= (char)hex[l>>16 &0xF];
-		x[15]= (char)hex[l>>20 &0xF];
-		x[16]= (char)hex[l>>24 &0xF];
-		x[17]= (char)hex[l>>28 &0xF];
-		x[18] = '-';
-		l=sr.nextInt();
-		// 4-block
-		x[19]= (char)hex[l>>0  &0xF];
-		x[20]= (char)hex[l>>4  &0xF];
-		x[21]= (char)hex[l>>8  &0xF];
-		x[22]= (char)hex[l>>12 &0xF];
-		x[23] = '-';
-		// 10-block
-		x[24]= (char)hex[l>>16 &0xF];
-		x[25]= (char)hex[l>>20 &0xF];
-		x[26]= (char)hex[l>>24 &0xF];
-		x[27]= (char)hex[l>>28 &0xF];
-		l=sr.nextInt();
-		x[28]= (char)hex[l>>0  &0xF];
-		x[29]= (char)hex[l>>4  &0xF];
-		x[30]= (char)hex[l>>8  &0xF];
-		x[31]= (char)hex[l>>12 &0xF];
-		x[32]= (char)hex[l>>16 &0xF];
-		x[33]= (char)hex[l>>20 &0xF];
-		x[34]= (char)hex[l>>24 &0xF];
-		x[35]= (char)hex[l>>28 &0xF];
-		return new String(x);
-	}
+	
+	private static char[] alphabet = new char[] { '0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','_','-' }; 
 
 	public void delete(String id) throws SqlException {
 		T t = get(id);
 		super.delete(t);
 	}
-
+	
+	private static String generateToken() {
+		char[] x = new char[16];
+		int l=0;
+		l=sr.nextInt();
+		x[0] = (char)alphabet[l>>0 &0x3F];
+		x[1] = (char)alphabet[l>>6 &0x3F];
+		x[2] = (char)alphabet[l>>12 &0x3F];
+		x[3] = (char)alphabet[l>>18 &0x3F];
+		l=sr.nextInt();
+		x[4] = (char)alphabet[l>>0 &0x3F];
+		x[5] = (char)alphabet[l>>6 &0x3F];
+		x[6] = (char)alphabet[l>>12 &0x3F];
+		x[7] = (char)alphabet[l>>18 &0x3F];
+		l=sr.nextInt();
+		x[8] = (char)alphabet[l>>0 &0x3F];
+		x[9] = (char)alphabet[l>>6 &0x3F];
+		x[10] = (char)alphabet[l>>12 &0x3F];
+		x[11] = (char)alphabet[l>>18 &0x3F];
+		l=sr.nextInt();
+		x[12] = (char)alphabet[l>>0 &0x3F];
+		x[13] = (char)alphabet[l>>6 &0x3F];
+		x[14] = (char)alphabet[l>>12 &0x3F];
+		x[15] = (char)alphabet[l>>18 &0x3F];
+		return new String(x);
+	}
+	
 	public T save(T t) throws SqlException {
 		return save(t,UUID.randomUUID().toString());
 	}
@@ -125,22 +98,13 @@ public abstract class AbstractGuidRepository<T extends BaseGuidEntity> extends A
 	}	
 	
 	public static void main(String[] args) {
-		int iter = 2000000;
-
 		long time = System.nanoTime();
+		int iter = 2000000;
 		for(int i = 0; i < iter; i++) {
-			generateUUID();
+			//System.err.println(generateUUID());
+			generateToken();
 		}
-		System.err.println("using splitrandom:");
-		System.err.println((System.nanoTime()-time)/(iter));
-
-		time = System.nanoTime();
-		for(int i = 0; i < iter; i++) {
-			UUID.randomUUID().toString();
-		}
-		System.err.println("using UUID:");
 		System.err.println((System.nanoTime()-time)/(iter));
 	}
-
 	
 }
