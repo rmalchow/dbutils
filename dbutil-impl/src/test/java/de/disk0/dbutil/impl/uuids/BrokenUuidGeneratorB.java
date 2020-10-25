@@ -1,14 +1,14 @@
 package de.disk0.dbutil.impl.uuids;
 
-import de.disk0.dbutil.api.GuidGenerator;
+import de.disk0.dbutil.api.IdGenerator;
 
-public class BrokenUuidGeneratorB implements GuidGenerator {
+public class BrokenUuidGeneratorB implements IdGenerator {
 	
 	public BrokenUuidGeneratorB() {
 	}
 
 	@Override
-	public String generateUuid() {
+	public String generateId() {
 		return "foo";
 	}
 

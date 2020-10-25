@@ -1,15 +1,15 @@
 package de.disk0.dbutil.impl.uuids;
 
-import de.disk0.dbutil.api.GuidGenerator;
+import de.disk0.dbutil.api.IdGenerator;
 
-public class BrokenUuidGeneratorA implements GuidGenerator {
+public class BrokenUuidGeneratorA implements IdGenerator {
 	
 	public BrokenUuidGeneratorA() {
 		// no empty constructor
 	}
 
 	@Override
-	public String generateUuid() {
+	public String generateId() {
 		throw new RuntimeException();
 	}
 

@@ -2,14 +2,14 @@ package de.disk0.dbutil.api.utils;
 
 import java.util.SplittableRandom;
 
-import de.disk0.dbutil.api.GuidGenerator;
+import de.disk0.dbutil.api.IdGenerator;
 
-public class GuidGeneratorFastUuid implements GuidGenerator {
+public class IdGeneratorFastGuid implements IdGenerator {
 	
 	private static char[] hex      = new char[] { '0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'}; 
 	private static SplittableRandom sr = new SplittableRandom();
 
-	public String generateUuid() {
+	public String generateId() {
 		/**
 		return UUID.randomUUID().toString();
 		 **/

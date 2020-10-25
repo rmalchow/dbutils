@@ -2,15 +2,15 @@ package de.disk0.dbutil.api.utils;
 
 import java.util.SplittableRandom;
 
-import de.disk0.dbutil.api.GuidGenerator;
+import de.disk0.dbutil.api.IdGenerator;
 
-public class GuidGeneratorFastBase64 implements GuidGenerator {
+public class IdGeneratorFastBase64 implements IdGenerator {
 	
 	private static SplittableRandom sr = new SplittableRandom();
 	private static char[] alphabet = new char[] { '0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','_','-' };
 	
 	@Override
-	public String generateUuid() {
+	public String generateId() {
 		char[] x = new char[16];
 		int l=0;
 		l=sr.nextInt();
