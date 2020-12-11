@@ -115,11 +115,11 @@ public abstract class AbstractRepository<T extends BaseEntity<S>,S> extends Abst
 	protected void afterDelete(T t) throws Exception {
 	}
 	
-	public void delete(T t) throws SqlException {
+	public int delete(T t) throws SqlException {
 		String sql = "[none]";
 		try {
 			if(t==null || t.getId()==null) {
-				return;
+				return 0;
 			}
 			beforeDelete(t);
 			NamedParameterJdbcTemplate templ = new NamedParameterJdbcTemplate(getDataSource());
@@ -128,6 +128,7 @@ public abstract class AbstractRepository<T extends BaseEntity<S>,S> extends Abst
 			sql = getDeleteOneStatement();
 			templ.update(sql, params);
 			afterDelete(t);
+			return 1;
 		} catch (Exception e) {
 			log.warn("delete failed: "+sql);
 			throw new SqlException("SQL.REPO.DELETE_FAILED",new Object[] { e.getMessage() },  e);

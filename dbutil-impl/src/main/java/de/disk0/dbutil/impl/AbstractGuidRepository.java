@@ -52,9 +52,9 @@ public abstract class AbstractGuidRepository<T extends BaseGuidEntity> extends A
 	}
 
 
-	public void delete(String id) throws SqlException {
+	public int delete(String id) throws SqlException {
 		T t = get(id);
-		super.delete(t);
+		return super.delete(t);
 	}
 
 	public T save(T t) throws SqlException {
