@@ -68,8 +68,10 @@ public abstract class AbstractRepository<T extends BaseEntity<S>,S> extends Abst
 			List<String> columns = new ArrayList<>();
 			List<String> values = new ArrayList<>();
 			for(ParsedColumn pc : pe.getColumns()) {
-				columns.add("`"+pc.getColumnName()+"`");
-				values.add(":"+pc.getColumnName());
+				if(pc.isInsertable()) {
+					columns.add("`"+pc.getColumnName()+"`");
+					values.add(":"+pc.getColumnName());
+				}
 			}
 			insertOneStatement = "INSERT INTO `"+pe.getTableName()+"` ("+(String.join(", ", columns))+") VALUES ("+(String.join(", ", values))+")";
 		}
@@ -81,7 +83,9 @@ public abstract class AbstractRepository<T extends BaseEntity<S>,S> extends Abst
 			ParsedEntity<T> pe = getParsedEntity();
 			List<String> columns = new ArrayList<>();
 			for(ParsedColumn pc : pe.getColumns()) {
-				columns.add("`"+pc.getColumnName()+"`=:"+pc.getColumnName());
+				if(pc.isUpdatable()) {
+					columns.add("`"+pc.getColumnName()+"`=:"+pc.getColumnName());
+				}
 			}
 			updateOneStatement = "UPDATE `"+pe.getTableName()+"` SET "+(String.join(", ", columns))+" WHERE `"+pe.getIdColumn()+"`=:id";
 		}

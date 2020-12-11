@@ -32,7 +32,7 @@ public class ParsedEntity<T> {
 					if(!column.name().equals("")) {
 						name = column.name();
 					}
-					columns.add(new ParsedColumn(f, name));
+					columns.add(new ParsedColumn(f, name, column.insertable(), column.updatable()));
 				}
 			}
 			c = c.getSuperclass();
@@ -59,10 +59,14 @@ public class ParsedEntity<T> {
 		
 		private Field field;
 		private String column;
+		private boolean updatable;
+		private boolean insertable;
 		
-		public ParsedColumn(Field field, String column) {
+		public ParsedColumn(Field field, String column, boolean insertable, boolean updatable) {
 			this.field = field;
 			this.column = column;
+			this.setInsertable(insertable);
+			this.setUpdatable(updatable);
 			this.field.setAccessible(true);
 		}
 		
@@ -129,6 +133,22 @@ public class ParsedEntity<T> {
 				return ((Enum)o).name();
 			}
 			return field.get(target);
+		}
+
+		public boolean isUpdatable() {
+			return updatable;
+		}
+
+		public void setUpdatable(boolean updatable) {
+			this.updatable = updatable;
+		}
+
+		public boolean isInsertable() {
+			return insertable;
+		}
+
+		public void setInsertable(boolean insertable) {
+			this.insertable = insertable;
 		}
 		
 	}

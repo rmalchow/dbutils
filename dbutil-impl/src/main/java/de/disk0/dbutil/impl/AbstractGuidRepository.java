@@ -27,22 +27,22 @@ public abstract class AbstractGuidRepository<T extends BaseGuidEntity> extends A
 	public String generateId() throws SqlException {
 		if(idGenerator!=null) return idGenerator.generateId();
 		try {
-			log.info("instantiating GUIG generator ... ");
+			log.info("instantiating GUID generator ... ");
 			IdGenerator idg = null;
 			Class<? extends IdGenerator> ggc = null;
 			IdGeneratorClass gc = this.getClass().getAnnotation(IdGeneratorClass.class);
 			if(gc!=null) {
-				log.info("instantiating GUIG generator ... annotation: "+gc.value());
+				log.info("instantiating GUID generator ... annotation: "+gc.value());
 				ggc = gc.value();
 			}
 			if(ggc!=null) {
-				log.info("instantiating GUIG generator ... instance: "+gc.value());
+				log.info("instantiating GUID generator ... instance: "+gc.value());
 				idg = ggc.newInstance();
 			}
 			if(idg == null) {
 				idg = new IdGeneratorGuid();
 			}
-			log.info("instantiating GUIG generator ... result: "+idg);
+			log.info("instantiating GUID generator ... result: "+idg);
 			idGenerator = idg;
 			return idGenerator.generateId();
 		} catch (Exception e) {
@@ -70,9 +70,9 @@ public abstract class AbstractGuidRepository<T extends BaseGuidEntity> extends A
 				t.setId(uuid);
 				String sql = getInsertOneStatement();
 				
-				MapSqlParameterSource params = unmap(t);
+				MapSqlParameterSource params = unmapInsert(t);
 				if(log.isDebugEnabled()) {
-					log.debug("saving entity: insert!");
+					log.debug("saving entity: insert! ("+getClazz().getSimpleName()+")");
 					log.debug("INSERT: "+sql);
 					log.debug("INSERT: "+params.getValues());
 				}
@@ -80,7 +80,7 @@ public abstract class AbstractGuidRepository<T extends BaseGuidEntity> extends A
 				log.debug("saving entity: "+done+" rows inserted");
 			} else {
 				String sql = getUpdateOneStatement();
-				MapSqlParameterSource params = unmap(t);
+				MapSqlParameterSource params = unmapUpdate(t);
 				if(log.isDebugEnabled()) {
 					log.debug("saving entity: update!");
 					log.debug("UPDATE: "+sql);
@@ -92,7 +92,7 @@ public abstract class AbstractGuidRepository<T extends BaseGuidEntity> extends A
 			log.debug("saving entity: calling after save ... ");
 			afterSave(t);
 			log.debug("saving entity: calling after save ... done!");
-			log.debug("saving entity: retrieving object as saved: >>>"+t.getId()+"<<<");
+			log.debug("saving entity: retrieving object as saved: >>>"+t.getId()+"<<< ("+getClazz().getSimpleName()+")");
 			T out = get(t.getId());
 			log.debug("saving entity: retrieving object as saved: "+(out==null?"NULL":"FOUND"));
 			return out;

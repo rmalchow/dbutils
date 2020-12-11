@@ -68,9 +68,21 @@ public abstract class AbstractMappingRepository<T> implements RowMapper<T> {
 	}
 	
 	@SuppressWarnings("rawtypes")
-	protected MapSqlParameterSource unmap(T t) throws IllegalArgumentException, IllegalAccessException {
+	protected MapSqlParameterSource unmapInsert(T t) throws IllegalArgumentException, IllegalAccessException {
 		MapSqlParameterSource out = new MapSqlParameterSource();
 		for(ParsedColumn pc : getParsedEntity().getColumns()) {
+			if(!pc.isInsertable()) continue;
+			Object o = pc.get(t);
+			out.addValue(pc.getColumnName(),o);
+		}
+		return out;
+	}
+	
+	@SuppressWarnings("rawtypes")
+	protected MapSqlParameterSource unmapUpdate(T t) throws IllegalArgumentException, IllegalAccessException {
+		MapSqlParameterSource out = new MapSqlParameterSource();
+		for(ParsedColumn pc : getParsedEntity().getColumns()) {
+			if(!pc.isUpdatable()) continue;
 			Object o = pc.get(t);
 			out.addValue(pc.getColumnName(),o);
 		}
@@ -157,31 +169,31 @@ public abstract class AbstractMappingRepository<T> implements RowMapper<T> {
 		throw new NonUniqueResultException();
 	}
 
-	public void delete(SimpleQuery q) throws SqlException {
-		this.delete(q.getQuery(),q.getParams());
+	public int delete(SimpleQuery q) throws SqlException {
+		return this.delete(q.getQuery(),q.getParams());
 	}
 	
-	public void update(SimpleQuery q) throws SqlException {
-		this.update(q.getQuery(),q.getParams());
+	public int update(SimpleQuery q) throws SqlException {
+		return this.update(q.getQuery(),q.getParams());
 	}
 	
 	
-	public void delete(String sql, Map<String,Object> params) throws SqlException {
+	public int delete(String sql, Map<String,Object> params) throws SqlException {
 		try {
 			NamedParameterJdbcTemplate templ = getTemplate();
 			log.debug("-------- update: "+sql+" / "+params);
-			templ.update(sql, params);
+			return templ.update(sql, params);
 		} catch (Exception e) {
 			log.warn("-------- delete failed: "+sql+" / "+params);
 			throw new SqlException("SQL.REPO.DELETE_FAILED",new Object[] { e.getMessage() },  e);
 		}
 	}
 	
-	public void update(String sql, Map<String,Object> params) throws SqlException {
+	public int update(String sql, Map<String,Object> params) throws SqlException {
 		try {
 			NamedParameterJdbcTemplate templ = getTemplate();
 			log.debug("-------- update: "+sql+" / "+params);
-			templ.update(sql, params);
+			return templ.update(sql, params);
 		} catch (Exception e) {
 			log.warn("-------- delete failed: "+sql+" / "+params);
 			throw new SqlException("SQL.REPO.DELETE_FAILED",new Object[] { e.getMessage() },  e);
