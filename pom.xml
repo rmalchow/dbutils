@@ -10,7 +10,7 @@
 
 	<groupId>de.disk0.dbutil</groupId>
 	<artifactId>dbutil</artifactId>
-	<version>0.0.65-SNAPSHOT</version>
+	<version>0.0.66-SNAPSHOT</version>
 
 	<packaging>pom</packaging>
 
