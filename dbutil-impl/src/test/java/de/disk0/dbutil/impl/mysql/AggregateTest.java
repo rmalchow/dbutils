@@ -27,7 +27,7 @@ public class AggregateTest {
 				t.field(Aggregate.CONCAT, t.field("path"), t.value("%"))
 			);
 
-		Assert.assertEquals("SELECT avg(`hund_1`.`value`) AS `hund` FROM `hund` `hund_1` WHERE `hund_1`.`hase` = concat(`hund_1`.`path`, :value_2)", s.getSql());
+		Assert.assertEquals("SELECT avg(`hund_1`.`value`) AS `hund` FROM `hund` `hund_1` WHERE `hund_1`.`hase` = concat(`hund_1`.`path`, :value_1)", s.getSql());
 		Assert.assertEquals("%", s.getParams().get("value_1"));
 		
 	}

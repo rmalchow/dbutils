@@ -31,14 +31,18 @@ public class MysqlSelect implements Select {
 	private int offset = -1;
 	private int max = -1;
 	
+	private String alias;
+	
 	private AliasGenerator aliasGenerator;
 	
 	public MysqlSelect() {
 		this.aliasGenerator = new AliasGenerator();
+		this.alias = "";
 	}
 	
 	public MysqlSelect(AliasGenerator aliasGenerator) {
 		this.aliasGenerator = aliasGenerator;
+		this.alias = aliasGenerator.generateAlias("subselect");
 	}
 	
 	@Override
@@ -246,7 +250,9 @@ public class MysqlSelect implements Select {
 	public Map<String, Object> getParams() {
 		Map<String, Object> out = new HashMap<>();
 
+		System.err.println("mysql selects: "+se.size());
 		for(SqlFragment sf : se) {
+			System.err.println("mysql selects: params: "+sf.getParams().size());
 			out.putAll(sf.getParams());
 		}
 		for(SqlFragment sf : tr) {
@@ -271,10 +277,7 @@ public class MysqlSelect implements Select {
 
 	@Override
 	public String getAlias() {
-		if(aliasGenerator!=null) {
-			return aliasGenerator.generateAlias("sub_select");
-		}
-		return "";
+		return alias;
 	}
 
 	@Override

@@ -112,7 +112,6 @@ public class MysqlTableReferenceSimple implements TableReference {
 
 	@Override
 	public Field value(Object value) {
-		params.put(aliasGenerator.generateAlias("value"), value);
 		return new MysqlField(aliasGenerator,value);
 	}
 

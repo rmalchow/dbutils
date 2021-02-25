@@ -19,13 +19,13 @@ public class AndOrTest {
 		Select s = new MysqlStatementBuilder().createSelect();
 		TableReference t = s.fromTable("hund");
 		s.condition(Operator.AND, t.field("id"), Comparator.EQ, t.value("1"));
-		Assert.assertEquals("SELECT * FROM `hund` `hund_1` WHERE `hund_1`.`id` = :value_2", s.getSql());
+		Assert.assertEquals("SELECT * FROM `hund` `hund_1` WHERE `hund_1`.`id` = :value_1", s.getSql());
 		
 		Condition c = s.condition(Operator.AND, t.field("id"), Comparator.EQ, t.value("2"));
-		Assert.assertEquals("SELECT * FROM `hund` `hund_1` WHERE (`hund_1`.`id` = :value_2 AND `hund_1`.`id` = :value_4)", s.getSql());
+		Assert.assertEquals("SELECT * FROM `hund` `hund_1` WHERE (`hund_1`.`id` = :value_1 AND `hund_1`.`id` = :value_2)", s.getSql());
 		
 		c.condition(Operator.OR, t.field("id"), Comparator.EQ, t.value("3"));
-		Assert.assertEquals("SELECT * FROM `hund` `hund_1` WHERE (`hund_1`.`id` = :value_2 AND (`hund_1`.`id` = :value_4 OR `hund_1`.`id` = :value_6))", s.getSql());
+		Assert.assertEquals("SELECT * FROM `hund` `hund_1` WHERE (`hund_1`.`id` = :value_1 AND (`hund_1`.`id` = :value_2 OR `hund_1`.`id` = :value_3))", s.getSql());
 		
 		
 	}

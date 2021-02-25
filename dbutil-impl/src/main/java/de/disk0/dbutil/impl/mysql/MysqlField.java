@@ -102,7 +102,13 @@ public class MysqlField implements Field {
 	
 	@Override
 	public Map<String, Object> getParams() {
-		return params;
+		Map<String, Object> out = new HashMap<String, Object>();
+		out.putAll(params);
+		
+		for(Field f : fields) {
+			out.putAll(f.getParams());
+		}
+		return out;
 	}
 	
 }
