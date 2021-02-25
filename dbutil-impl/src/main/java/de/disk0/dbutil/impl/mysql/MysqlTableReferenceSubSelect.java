@@ -64,7 +64,6 @@ public class MysqlTableReferenceSubSelect extends MysqlTableReferenceSimple impl
 		for(TableReference tr : refs) {
 			out.putAll(tr.getParams());
 		}
-		System.err.println(" ----- TR: "+out);
 		return out;
 	}
 	
