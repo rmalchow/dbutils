@@ -250,9 +250,7 @@ public class MysqlSelect implements Select {
 	public Map<String, Object> getParams() {
 		Map<String, Object> out = new HashMap<>();
 
-		System.err.println("mysql selects: "+se.size());
 		for(SqlFragment sf : se) {
-			System.err.println("mysql selects: params: "+sf.getParams().size());
 			out.putAll(sf.getParams());
 		}
 		for(SqlFragment sf : tr) {
