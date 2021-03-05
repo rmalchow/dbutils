@@ -49,7 +49,7 @@ public abstract class AbstractRepository<T extends BaseEntity<S>,S> extends Abst
 		Map<String,Object> params = new HashMap<>();
 		String sql = getFindOneStatement();
 		try {
-			NamedParameterJdbcTemplate t = new NamedParameterJdbcTemplate(getDataSource());
+			NamedParameterJdbcTemplate t = getTemplate();
 			params.put("id", id);
 			List<T> ts = t.query(getFindOneStatement(), params, this);
 			if(ts.size()>0) {
@@ -122,7 +122,7 @@ public abstract class AbstractRepository<T extends BaseEntity<S>,S> extends Abst
 				return 0;
 			}
 			beforeDelete(t);
-			NamedParameterJdbcTemplate templ = new NamedParameterJdbcTemplate(getDataSource());
+			NamedParameterJdbcTemplate templ = getTemplate();
 			Map<String,Object> params = new HashMap<>();
 			params.put("id", t.getId());
 			sql = getDeleteOneStatement();

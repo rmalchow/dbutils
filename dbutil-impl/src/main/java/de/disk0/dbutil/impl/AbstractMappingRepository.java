@@ -21,8 +21,6 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 import de.disk0.dbutil.api.Select;
 import de.disk0.dbutil.api.exceptions.SqlException;
-import de.disk0.dbutil.impl.util.DbTemplate;
-import de.disk0.dbutil.impl.util.DbTemplateHolder;
 import de.disk0.dbutil.impl.util.ParsedEntity;
 import de.disk0.dbutil.impl.util.ParsedEntity.ParsedColumn;
 
@@ -30,8 +28,8 @@ public abstract class AbstractMappingRepository<T> implements RowMapper<T> {
 	
 	private static Log log = LogFactory.getLog(AbstractMappingRepository.class);
 
-	@Autowired
-	protected DataSource dataSource;
+	//@Autowired
+	//protected DataSource dataSource;
 
 	protected ParsedEntity<T> pe;
 	
@@ -39,6 +37,7 @@ public abstract class AbstractMappingRepository<T> implements RowMapper<T> {
 	
 	private List<String> applicableColumns;
 	
+	@Autowired
 	private NamedParameterJdbcTemplate template;
 	
 	@SuppressWarnings("unchecked")
@@ -201,6 +200,7 @@ public abstract class AbstractMappingRepository<T> implements RowMapper<T> {
 	}
 	
 	public NamedParameterJdbcTemplate getTemplate() {
+		/**
 		DbTemplate dt = DbTemplateHolder.get();
 		if(dt != null) {
 			return dt.getTemplate(getDataSource());
@@ -208,15 +208,12 @@ public abstract class AbstractMappingRepository<T> implements RowMapper<T> {
 		if(template==null) {
 			template = new NamedParameterJdbcTemplate(getDataSource());
 		}
+		 **/
 		return template;
 	}
 
-	public DataSource getDataSource() {
-		return dataSource;
-	}
-
 	public void setDataSource(DataSource dataSource) {
-		this.dataSource = dataSource;
+		this.template = new NamedParameterJdbcTemplate(dataSource);
 	}
 	
 }
