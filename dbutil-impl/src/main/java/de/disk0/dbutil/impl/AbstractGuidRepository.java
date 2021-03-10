@@ -76,8 +76,15 @@ public abstract class AbstractGuidRepository<T extends BaseGuidEntity> extends A
 					log.debug("INSERT: "+sql);
 					log.debug("INSERT: "+params.getValues());
 				}
-				int done = templ.update(sql, params);
-				log.debug("saving entity: "+done+" rows inserted");
+				try {
+					int done = templ.update(sql, params);
+					log.debug("saving entity: "+done+" rows inserted");
+				} catch (Exception e) {
+					log.warn("saving failed: "+(sql));
+					log.warn("saving failed: "+(params));
+					throw e;
+					
+				}
 			} else {
 				String sql = getUpdateOneStatement();
 				MapSqlParameterSource params = unmapUpdate(t);

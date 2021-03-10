@@ -2,6 +2,7 @@ package de.disk0.dbutil.impl.util;
 
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
@@ -82,6 +83,10 @@ public class ParsedEntity<T> {
 
 				} else if(field.getType()==BigDecimal.class) {
 					field.set(target,rs.getBigDecimal(column));
+
+				} else if(field.getType()==BigInteger.class) {
+				
+					field.set(target,new BigInteger(rs.getString(column)));
 
 				} else if(field.getType()==Integer.class || field.getType()==Integer.TYPE) {
                     int value = rs.getInt(column);
