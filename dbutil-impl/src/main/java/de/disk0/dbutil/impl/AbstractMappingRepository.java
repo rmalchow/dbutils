@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import javax.persistence.NonUniqueResultException;
 import javax.sql.DataSource;
@@ -23,6 +24,11 @@ import de.disk0.dbutil.api.Select;
 import de.disk0.dbutil.api.exceptions.SqlException;
 import de.disk0.dbutil.impl.util.ParsedEntity;
 import de.disk0.dbutil.impl.util.ParsedEntity.ParsedColumn;
+import io.micrometer.core.instrument.ImmutableTag;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tag;
+import io.micrometer.core.instrument.Timer;
+import io.micrometer.core.instrument.noop.NoopTimer;
 
 public abstract class AbstractMappingRepository<T> implements RowMapper<T> {
 	
@@ -30,6 +36,11 @@ public abstract class AbstractMappingRepository<T> implements RowMapper<T> {
 
 	//@Autowired
 	//protected DataSource dataSource;
+	
+	@Autowired(required = false)
+	private MeterRegistry meterRegistry;
+	
+	private Timer timer;
 
 	protected ParsedEntity<T> pe;
 	
@@ -47,6 +58,20 @@ public abstract class AbstractMappingRepository<T> implements RowMapper<T> {
 		}
 		return clazz;
 	}
+	
+	public Timer getTimer() {
+		if(timer == null) {
+			if(meterRegistry != null) {
+				List<Tag> tags =  new ArrayList<>();
+				tags.add(new ImmutableTag("object", getClazz().getSimpleName()));
+				timer = meterRegistry.timer("dbutil.sql.find",tags);
+			} else {
+				timer = new NoopTimer(null);
+			}
+		}
+		return timer;
+	}
+	
 	
 	public ParsedEntity<T> getParsedEntity() {
 		if(pe==null) {
@@ -135,6 +160,7 @@ public abstract class AbstractMappingRepository<T> implements RowMapper<T> {
 	}
 	
 	public List<T> find(String sql, Map<String,Object> params) throws SqlException {
+		long timer = System.nanoTime();
 		try {
 			NamedParameterJdbcTemplate t = getTemplate();
 			long start = System.currentTimeMillis();
@@ -145,6 +171,9 @@ public abstract class AbstractMappingRepository<T> implements RowMapper<T> {
 		} catch (Exception e) {
 			log.warn("-------- query failed: "+sql+" / "+params);
 			throw new SqlException("SQL.REPO.LIST_FAILED",new Object[] { e.getMessage() },  e);
+		} finally {
+			long end = System.nanoTime();
+			getTimer().record(end-timer, TimeUnit.NANOSECONDS);
 		}
 	}
 
