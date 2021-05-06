@@ -24,6 +24,7 @@ import de.disk0.dbutil.api.Select;
 import de.disk0.dbutil.api.exceptions.SqlException;
 import de.disk0.dbutil.impl.util.ParsedEntity;
 import de.disk0.dbutil.impl.util.ParsedEntity.ParsedColumn;
+import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.ImmutableTag;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
@@ -41,6 +42,7 @@ public abstract class AbstractMappingRepository<T> implements RowMapper<T> {
 	private MeterRegistry meterRegistry;
 	
 	private Timer timer;
+	private Map<String,Counter> counters;
 
 	protected ParsedEntity<T> pe;
 	
@@ -72,7 +74,23 @@ public abstract class AbstractMappingRepository<T> implements RowMapper<T> {
 		return timer;
 	}
 	
-	
+	private Counter getCounter(String type) {
+		Counter c = counters.get(type);
+		if(c == null) {
+			List<Tag> tags =  new ArrayList<>();
+			tags.add(new ImmutableTag("object", getClazz().getSimpleName()));
+			tags.add(new ImmutableTag("type", type));
+			c = meterRegistry.counter("dbutil.sql.find",tags);
+			counters.put(type, c);
+		}
+		return c;
+	}
+
+	private void tick(String type) {
+		getCounter(type).increment();
+	}
+
+		
 	public ParsedEntity<T> getParsedEntity() {
 		if(pe==null) {
 			try {

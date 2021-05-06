@@ -5,6 +5,8 @@ import java.util.Map;
 
 import de.disk0.dbutil.api.TableReference;
 import de.disk0.dbutil.impl.util.AliasGenerator;
+import de.disk0.dbutil.impl.util.EnumUtil;
+import de.disk0.dbutil.impl.util.FormatUtil;
 
 public class MysqlFieldValuePair {
 
@@ -15,6 +17,7 @@ public class MysqlFieldValuePair {
 	private String valueName;
 	private Object value;
 
+	
 	private Map<String,Object> params = new HashMap<>();
 
 	public MysqlFieldValuePair(AliasGenerator aliasGenerator, TableReference table1, String field1, TableReference table2, String field2, Object value) {
@@ -24,6 +27,10 @@ public class MysqlFieldValuePair {
 		this.field2 = field2;
 		if(value != null) {
 			this.valueName = aliasGenerator.generateAlias(field1);
+			
+			value = EnumUtil.resolveEnums(value);
+			value = FormatUtil.resolve(value);
+			
 			this.value = value;
 			params.put(valueName, value);
 		}

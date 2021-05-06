@@ -10,6 +10,7 @@ import de.disk0.dbutil.api.Field;
 import de.disk0.dbutil.api.TableReference;
 import de.disk0.dbutil.impl.util.AliasGenerator;
 import de.disk0.dbutil.impl.util.EnumUtil;
+import de.disk0.dbutil.impl.util.FormatUtil;
 
 public class MysqlField implements Field {
 
@@ -32,6 +33,7 @@ public class MysqlField implements Field {
 	public MysqlField(AliasGenerator ag, Object value) {
 		this.valueAlias = ag.generateAlias("value");
 		value = EnumUtil.resolveEnums(value);
+		value = FormatUtil.resolve(value);
 		this.params.put(this.valueAlias, value);
 	}
 	
