@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>de.disk0.dbutil</groupId>
 		<artifactId>dbutil</artifactId>
-		<version>0.0.71-SNAPSHOT</version>
+		<version>0.0.72-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>dbutil-impl</artifactId>
@@ -15,7 +15,7 @@
 		<dependency>
 			<groupId>de.disk0.dbutil</groupId>
 			<artifactId>dbutil-api</artifactId>
-			<version>0.0.71-SNAPSHOT</version>
+			<version>0.0.72-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
