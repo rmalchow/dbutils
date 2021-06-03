@@ -159,7 +159,7 @@ public abstract class AbstractMappingRepository<T> implements RowMapper<T> {
 				try {
 					pc.set(out, rs);
 				} catch (Exception e) {
-					throw new RuntimeException("failed to map column: "+pc.getColumnName(),e);
+					throw new RuntimeException("failed to map column: "+pc.getColumnName()+" of type "+getClazz().getSimpleName(),e);
 				}
 			}
 			return out;
