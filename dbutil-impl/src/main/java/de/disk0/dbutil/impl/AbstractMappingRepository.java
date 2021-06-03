@@ -147,7 +147,7 @@ public abstract class AbstractMappingRepository<T> implements RowMapper<T> {
 			for(ParsedColumn pc : getParsedEntity().getColumns()) {
 				log.debug("parsing: "+pc.getColumnName());
 				if(!applicableColumns.contains(pc.getColumnName().toUpperCase())) {
-					log.warn("column: "+pc.getColumnName()+" in object, but not in result set");
+					log.warn("column: "+pc.getColumnName()+" in object ("+getClazz().getSimpleName()+"), but not in result set");
 					ResultSetMetaData md = rs.getMetaData();
 					for(int i=0; i < md.getColumnCount();i++) {
 						log.warn(" ---- "+md.getColumnName(i+1)+" / "+md.getColumnLabel(i+1));
