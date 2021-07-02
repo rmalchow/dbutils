@@ -116,6 +116,11 @@ public class MysqlTableReferenceSimple implements TableReference {
 	}
 
 	@Override
+	public Field value(Object value, String name) {
+		return new MysqlField(aliasGenerator,value,name);
+	}
+
+	@Override
 	public Field field(Aggregate a, Field... references) {
 		return new MysqlField(a, references);
 	}

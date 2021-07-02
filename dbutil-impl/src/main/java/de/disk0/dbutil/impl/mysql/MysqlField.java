@@ -31,7 +31,11 @@ public class MysqlField implements Field {
 	}
 
 	public MysqlField(AliasGenerator ag, Object value) {
-		this.valueAlias = ag.generateAlias("value");
+		this(ag,value,"value");
+	}
+	
+	public MysqlField(AliasGenerator ag, Object value,String namePrefix) {
+		this.valueAlias = ag.generateAlias(namePrefix);
 		value = EnumUtil.resolveEnums(value);
 		value = FormatUtil.resolve(value);
 		this.params.put(this.valueAlias, value);

@@ -71,4 +71,15 @@ public class SelectValueTest {
 		
 	}
 	
+	@Test
+	public void testNamedValuesExpectSuccess() {
+		Select s = new MysqlStatementBuilder().createSelect();
+		TableReference t = s.fromTable("hund");
+
+		s.condition(Operator.AND,t.field("id"), Comparator.EQ, t.value(123,"id"));
+		Assert.assertEquals("SELECT * FROM `hund` `hund_1` WHERE `hund_1`.`id` = :id_1", s.getSql());
+
+	}
+	
+	
 }
