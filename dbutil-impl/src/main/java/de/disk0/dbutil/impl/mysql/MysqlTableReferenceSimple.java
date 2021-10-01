@@ -77,7 +77,20 @@ public class MysqlTableReferenceSimple implements TableReference {
 	@Override
 	public JoinTable leftJoin(String table) {
 		MysqlTableReferenceSimple s = new MysqlTableReferenceSimple(this.aliasGenerator,table);
-		MysqlTableReferenceJoinTable j = new MysqlTableReferenceJoinTable(this.aliasGenerator, s, true);
+		MysqlTableReferenceJoinTable j = new MysqlTableReferenceJoinTable(this.aliasGenerator, s, true, false);
+		refs.add(j);
+		return j;
+	}
+
+	@Override
+	public JoinTable leftOuterJoin(Class<? extends BaseEntity<?>> table) {
+		return leftOuterJoin(table.getAnnotation(Table.class).name());
+	}
+	
+	@Override
+	public JoinTable leftOuterJoin(String table) {
+		MysqlTableReferenceSimple s = new MysqlTableReferenceSimple(this.aliasGenerator,table);
+		MysqlTableReferenceJoinTable j = new MysqlTableReferenceJoinTable(this.aliasGenerator, s, true, true);
 		refs.add(j);
 		return j;
 	}
@@ -90,7 +103,7 @@ public class MysqlTableReferenceSimple implements TableReference {
 	@Override
 	public JoinTable join(String table) {
 		MysqlTableReferenceSimple s = new MysqlTableReferenceSimple(this.aliasGenerator,table);
-		MysqlTableReferenceJoinTable j = new MysqlTableReferenceJoinTable(this.aliasGenerator, s, false);
+		MysqlTableReferenceJoinTable j = new MysqlTableReferenceJoinTable(this.aliasGenerator, s, false, false);
 		refs.add(j);
 		return j;
 	}

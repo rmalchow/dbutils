@@ -21,11 +21,13 @@ public class MysqlTableReferenceJoinTable extends MysqlTableReferenceSimple impl
 	private Condition condition;
 	
 	private boolean left;
+	private boolean outer;
 	
-	protected MysqlTableReferenceJoinTable(AliasGenerator aliasGenerator, TableReference joinTarget, boolean left) {
+	protected MysqlTableReferenceJoinTable(AliasGenerator aliasGenerator, TableReference joinTarget, boolean left, boolean outer) {
 		super(aliasGenerator);
 		this.alias = aliasGenerator.generateAlias("subselect");
 		this.left = left;
+		this.outer = outer;
 		this.joinTarget = joinTarget;
 	}
 	
@@ -34,6 +36,9 @@ public class MysqlTableReferenceJoinTable extends MysqlTableReferenceSimple impl
 		List<String> cs = new ArrayList<>();
 		if(left) {
 			cs.add("LEFT");
+		}
+		if(outer) {
+			cs.add("OUTER");
 		}
 		cs.add("JOIN");
 		cs.add(joinTarget.getSql());
