@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>de.disk0.dbutil</groupId>
 		<artifactId>dbutil</artifactId>
-		<version>0.0.75-SNAPSHOT</version>
+		<version>0.0.76-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>dbutils-examples</artifactId>
@@ -15,7 +15,7 @@
 		<dependency>
 			<groupId>de.disk0.dbutil</groupId>
 			<artifactId>dbutil-impl</artifactId>
-			<version>0.0.75-SNAPSHOT</version>
+			<version>0.0.76-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 </project>
