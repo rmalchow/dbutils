@@ -187,7 +187,7 @@ public abstract class AbstractMappingRepository<T> implements RowMapper<T> {
 			log.debug("-------- found: "+out.size()+" / "+(System.currentTimeMillis()-start)+"ms");
 			return out;
 		} catch (Exception e) {
-			log.warn("-------- query failed: "+sql+" / "+params);
+			log.warn("-------- query failed: "+sql+" / "+params,e);
 			throw new SqlException("SQL.REPO.LIST_FAILED",new Object[] { e.getMessage() },  e);
 		} finally {
 			long end = System.nanoTime();
@@ -209,7 +209,7 @@ public abstract class AbstractMappingRepository<T> implements RowMapper<T> {
 			if(out.size()==0) return null;
 			if(out.size()==1) return out.get(0);
 		} catch (Exception e) {
-			log.warn("-------- query failed: "+sql+" / "+params);
+			log.warn("-------- query failed: "+sql+" / "+params,e);
 			throw new SqlException("SQL.REPO.LIST_FAILED",new Object[] { e.getMessage() },  e);
 		}
 		throw new NonUniqueResultException();
@@ -230,7 +230,7 @@ public abstract class AbstractMappingRepository<T> implements RowMapper<T> {
 			log.debug("-------- update: "+sql+" / "+params);
 			return templ.update(sql, params);
 		} catch (Exception e) {
-			log.warn("-------- delete failed: "+sql+" / "+params);
+			log.warn("-------- delete failed: "+sql+" / "+params,e);
 			throw new SqlException("SQL.REPO.DELETE_FAILED",new Object[] { e.getMessage() },  e);
 		}
 	}
@@ -241,7 +241,7 @@ public abstract class AbstractMappingRepository<T> implements RowMapper<T> {
 			log.debug("-------- update: "+sql+" / "+params);
 			return templ.update(sql, params);
 		} catch (Exception e) {
-			log.warn("-------- delete failed: "+sql+" / "+params);
+			log.warn("-------- delete failed: "+sql+" / "+params,e);
 			throw new SqlException("SQL.REPO.DELETE_FAILED",new Object[] { e.getMessage() },  e);
 		}
 	}
