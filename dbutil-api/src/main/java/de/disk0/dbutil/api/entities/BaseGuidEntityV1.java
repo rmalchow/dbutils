@@ -8,7 +8,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 
 @Entity
-public class BaseGuidEntityV1  implements BaseGuidEntityV1 {
+public class BaseGuidEntityV1  implements BaseGuidEntity {
 
 	@Id
 	@Column(name = "id", unique = true, nullable = false)
