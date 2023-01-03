@@ -1,8 +1,5 @@
 package de.disk0.dbutil.impl.config;
 
-import javax.sql.DataSource;
-
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -10,27 +7,26 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
+import javax.sql.DataSource;
+
 @Configuration
+@ConditionalOnProperty(name = "spring.reader.enabled", havingValue = "true")
 public class ReaderConfig {
 
-
-	@Bean(name="readerDSprops")
+	@Bean
 	@ConfigurationProperties("spring.reader")
-	@ConditionalOnProperty(name = "spring.reader.enabled", havingValue = "true", matchIfMissing = false)
-	public static DataSourceProperties readerDSProperties() {
+	public static DataSourceProperties readerDSprops() {
 		return new DataSourceProperties();
 	}
-	
-	@Bean(name="readerDS")
-	@ConditionalOnProperty(name = "spring.reader.enabled", havingValue = "true", matchIfMissing = false)
-	public static DataSource readerDS( @Qualifier("readerDSprops") DataSourceProperties readerDSprops) {
-		return readerDSprops.initializeDataSourceBuilder().build();
+
+	@Bean
+	public static DataSource readerDS() {
+		return readerDSprops().initializeDataSourceBuilder().build();
 	}
 
-	@Bean(name = "readerTemplate")
-	@ConditionalOnProperty(name = "spring.reader.enabled", havingValue = "true", matchIfMissing = false)
-	public static NamedParameterJdbcTemplate readerTemplate( @Qualifier("readerDS") DataSource readerDS) {
-		return new NamedParameterJdbcTemplate(readerDS);
-	}	
-	
+	@Bean
+	public static NamedParameterJdbcTemplate readerTemplate() {
+		return new NamedParameterJdbcTemplate(readerDS());
+	}
+
 }
