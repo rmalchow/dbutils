@@ -10,7 +10,7 @@ i have been using (and improving) it for quite a while now, and found it useful 
 
 i started this mostly out of lazyness. i didn't want the complexity of full blown JPA criteria, and i also wanted less runtim magic than what spring data repositories do. for me, this library is a good balance between simplicity and minimizing boilerplate code. basically, once the entity is defined, the only thing i have to deal with the code to find specific entries (more on the pattern i use below).
 
-this uses `java.sql.DataSource` and `NamedParameterJdbcTemplate` from spring-jdbc, the annotations from `javax.persistence`, and plain reflection to do the actual mapping. it can currently map most standard field types (including enums).
+this uses `java.sql.DataSource` and `NamedParameterJdbcTemplate` from spring-jdbc, the annotations from `javax.persistence` or `jakarta.persistence`, and plain reflection to do the actual mapping. it can currently map most standard field types (including enums).
 
 it also offers pretty extensive and direct control over the SQL that is produced.
 
@@ -24,23 +24,24 @@ big thanks to everyone who has contributed to this, especially @mdjimy
 
 ### compatibility
 
-Supports Spring Boot 2.0.x - Spring Boot 2.3.x.
+Supports Spring Boot 2.x - Spring Boot 3.x.
 
-Java 8 - Java 14. 
+Java 8 - Java 17. 
 
+Both Javax and Jakarta Persistence API are supported
 
 
 ### dependencies
 
 this has very few dependencies - and thanks to @mdjimy, there are even less from > 0.52. the few things you DO need are as these:
 
-since the JPA APIs are a big mess, packaging wise, and we only really need a handful of annotations from there, `javax-persinstence` , it is now set to "provided" - so you will have to pick your poison. i normally use:
+since the JPA APIs are a big mess, packaging wise, and we only really need a handful of annotations from there, Persistence API , it is now set to "optional" - so you will have to pick your poison. i normally use:
 
 ```xml
 <dependency>
-	<groupId>javax.persistence</groupId>
-    <artifactId>javax.persistence-api</artifactId>
-	<version>2.2</version>
+    <groupId>jakarta.persistence</groupId>
+    <artifactId>jakarta.persistence-api</artifactId>
+    <version>2.2</version>
 </dependency>
 ```
 

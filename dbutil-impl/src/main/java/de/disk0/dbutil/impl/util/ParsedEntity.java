@@ -7,8 +7,7 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.Column;
-import javax.persistence.Table;
+import de.disk0.dbutil.impl.util.PersistenceApiUtils.Column;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -27,20 +26,20 @@ public class ParsedEntity<T> {
 			for(Field f : c.getDeclaredFields()) {
 				if(x.contains(f.getName())) continue;
 				x.add(f.getName());
-				if(f.getAnnotation(Column.class)!=null) {
-					Column column = f.getAnnotation(Column.class);
+				Column column = PersistenceApiUtils.getColumn(f);
+				if(column!=null) {
 					String name = f.getName();
-					if(!column.name().equals("")) {
-						name = column.name();
+					if(!column.getName().equals("")) {
+						name = column.getName();
 					}
-					columns.add(new ParsedColumn(f, name, column.insertable(), column.updatable()));
+					columns.add(new ParsedColumn(f, name, column.isInsertable(), column.isUpdatable()));
 				}
 			}
 			c = c.getSuperclass();
 			if(c==null) break;
 			
 		} while(clazz.getSuperclass()!=null);
-		tableName = clazz.getAnnotation(Table.class).name();
+		tableName = PersistenceApiUtils.getTableName(clazz);
 		
 	}
 	

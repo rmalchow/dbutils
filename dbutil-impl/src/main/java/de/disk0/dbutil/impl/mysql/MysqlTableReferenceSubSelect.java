@@ -5,8 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.persistence.Table;
-
 import de.disk0.dbutil.api.Aggregate;
 import de.disk0.dbutil.api.Comparator;
 import de.disk0.dbutil.api.Condition;
@@ -17,6 +15,7 @@ import de.disk0.dbutil.api.SubSelect;
 import de.disk0.dbutil.api.TableReference;
 import de.disk0.dbutil.api.entities.BaseEntity;
 import de.disk0.dbutil.impl.util.AliasGenerator;
+import de.disk0.dbutil.impl.util.PersistenceApiUtils;
 
 public class MysqlTableReferenceSubSelect extends MysqlTableReferenceSimple implements SubSelect {
 
@@ -106,7 +105,7 @@ public class MysqlTableReferenceSubSelect extends MysqlTableReferenceSimple impl
 
 	@Override
 	public TableReference fromTable(Class<? extends BaseEntity<?>> table) {
-		return fromTable(table.getAnnotation(Table.class).name());
+		return fromTable(PersistenceApiUtils.getTableName(table));
 	}
 	
 	public SubSelect from() {

@@ -5,16 +5,17 @@ import java.security.InvalidParameterException;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
-import javax.persistence.NonUniqueResultException;
+import de.disk0.dbutil.impl.micrometer.MicrometerAdapter;
+import de.disk0.dbutil.impl.util.PersistenceApiUtils;
 import javax.sql.DataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import lombok.extern.apachecommons.CommonsLog;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -24,25 +25,9 @@ import de.disk0.dbutil.api.Select;
 import de.disk0.dbutil.api.exceptions.SqlException;
 import de.disk0.dbutil.impl.util.ParsedEntity;
 import de.disk0.dbutil.impl.util.ParsedEntity.ParsedColumn;
-import io.micrometer.core.instrument.Counter;
-import io.micrometer.core.instrument.ImmutableTag;
-import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.Tag;
-import io.micrometer.core.instrument.Timer;
-import io.micrometer.core.instrument.noop.NoopTimer;
 
+@CommonsLog
 public abstract class AbstractMappingRepository<T> implements RowMapper<T> {
-	
-	private static Log log = LogFactory.getLog(AbstractMappingRepository.class);
-
-	//@Autowired
-	//protected DataSource dataSource;
-	
-	@Autowired(required = false)
-	private MeterRegistry meterRegistry;
-	
-	private Timer timer;
-	private Map<String,Counter> counters;
 
 	protected ParsedEntity<T> pe;
 	
@@ -52,6 +37,9 @@ public abstract class AbstractMappingRepository<T> implements RowMapper<T> {
 	
 	@Autowired
 	private NamedParameterJdbcTemplate template;
+
+	@Autowired(required = false)
+	private MicrometerAdapter micrometerAdapter;
 	
 	@SuppressWarnings("unchecked")
 	protected Class<T> getClazz() {
@@ -60,36 +48,6 @@ public abstract class AbstractMappingRepository<T> implements RowMapper<T> {
 		}
 		return clazz;
 	}
-	
-	public Timer getTimer() {
-		if(timer == null) {
-			if(meterRegistry != null) {
-				List<Tag> tags =  new ArrayList<>();
-				tags.add(new ImmutableTag("object", getClazz().getSimpleName()));
-				timer = meterRegistry.timer("dbutil.sql.find",tags);
-			} else {
-				timer = new NoopTimer(null);
-			}
-		}
-		return timer;
-	}
-	
-	private Counter getCounter(String type) {
-		Counter c = counters.get(type);
-		if(c == null) {
-			List<Tag> tags =  new ArrayList<>();
-			tags.add(new ImmutableTag("object", getClazz().getSimpleName()));
-			tags.add(new ImmutableTag("type", type));
-			c = meterRegistry.counter("dbutil.sql.find",tags);
-			counters.put(type, c);
-		}
-		return c;
-	}
-
-	private void tick(String type) {
-		getCounter(type).increment();
-	}
-
 		
 	public ParsedEntity<T> getParsedEntity() {
 		if(pe==null) {
@@ -178,7 +136,7 @@ public abstract class AbstractMappingRepository<T> implements RowMapper<T> {
 	}
 	
 	public List<T> find(String sql, Map<String,Object> params) throws SqlException {
-		long timer = System.nanoTime();
+		Instant timerStart = Instant.now();
 		try {
 			NamedParameterJdbcTemplate t = getTemplate();
 			long start = System.currentTimeMillis();
@@ -190,8 +148,14 @@ public abstract class AbstractMappingRepository<T> implements RowMapper<T> {
 			log.warn("-------- query failed: "+sql+" / "+params,e);
 			throw new SqlException("SQL.REPO.LIST_FAILED",new Object[] { e.getMessage() },  e);
 		} finally {
-			long end = System.nanoTime();
-			getTimer().record(end-timer, TimeUnit.NANOSECONDS);
+			if (micrometerAdapter != null) {
+				Instant timerEnd = Instant.now();
+				micrometerAdapter.record(
+						Duration.between(timerStart, timerEnd),
+						"dbutil.sql.find",
+						MicrometerAdapter.Tag.of("object", getClazz().getSimpleName())
+				);
+			}
 		}
 	}
 
@@ -212,7 +176,7 @@ public abstract class AbstractMappingRepository<T> implements RowMapper<T> {
 			log.warn("-------- query failed: "+sql+" / "+params,e);
 			throw new SqlException("SQL.REPO.LIST_FAILED",new Object[] { e.getMessage() },  e);
 		}
-		throw new NonUniqueResultException();
+		throw PersistenceApiUtils.nonUniqueResultException();
 	}
 
 	public int delete(SimpleQuery q) throws SqlException {
