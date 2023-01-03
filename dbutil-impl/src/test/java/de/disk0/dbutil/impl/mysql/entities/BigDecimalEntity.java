@@ -2,8 +2,8 @@ package de.disk0.dbutil.impl.mysql.entities;
 
 import java.math.BigDecimal;
 
-import javax.persistence.Column;
-import javax.persistence.Table;
+import jakarta.persistence.Column;
+import jakarta.persistence.Table;
 
 import de.disk0.dbutil.api.entities.BaseGuidEntity;
 

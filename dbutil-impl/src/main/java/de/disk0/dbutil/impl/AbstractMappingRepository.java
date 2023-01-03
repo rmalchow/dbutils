@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import javax.persistence.NonUniqueResultException;
+import de.disk0.dbutil.impl.util.PersistenceApiUtils;
 import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
@@ -212,7 +212,7 @@ public abstract class AbstractMappingRepository<T> implements RowMapper<T> {
 			log.warn("-------- query failed: "+sql+" / "+params,e);
 			throw new SqlException("SQL.REPO.LIST_FAILED",new Object[] { e.getMessage() },  e);
 		}
-		throw new NonUniqueResultException();
+		throw PersistenceApiUtils.nonUniqueResultException();
 	}
 
 	public int delete(SimpleQuery q) throws SqlException {

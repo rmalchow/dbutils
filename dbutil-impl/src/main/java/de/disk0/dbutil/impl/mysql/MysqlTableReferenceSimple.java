@@ -5,14 +5,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.persistence.Table;
-
 import de.disk0.dbutil.api.Aggregate;
 import de.disk0.dbutil.api.Field;
 import de.disk0.dbutil.api.JoinTable;
 import de.disk0.dbutil.api.TableReference;
 import de.disk0.dbutil.api.entities.BaseEntity;
 import de.disk0.dbutil.impl.util.AliasGenerator;
+import de.disk0.dbutil.impl.util.PersistenceApiUtils;
 
 public class MysqlTableReferenceSimple implements TableReference {
 
@@ -71,7 +70,7 @@ public class MysqlTableReferenceSimple implements TableReference {
 
 	@Override
 	public JoinTable leftJoin(Class<? extends BaseEntity<?>> table) {
-		return leftJoin(table.getAnnotation(Table.class).name());
+		return leftJoin(PersistenceApiUtils.getTableName(table));
 	}
 	
 	@Override
@@ -84,7 +83,7 @@ public class MysqlTableReferenceSimple implements TableReference {
 
 	@Override
 	public JoinTable leftOuterJoin(Class<? extends BaseEntity<?>> table) {
-		return leftOuterJoin(table.getAnnotation(Table.class).name());
+		return leftOuterJoin(PersistenceApiUtils.getTableName(table));
 	}
 	
 	@Override
@@ -97,7 +96,7 @@ public class MysqlTableReferenceSimple implements TableReference {
 
 	@Override
 	public JoinTable join(Class<? extends BaseEntity<?>> table) {
-		return join(table.getAnnotation(Table.class).name());
+		return join(PersistenceApiUtils.getTableName(table));
 	}
 	
 	@Override

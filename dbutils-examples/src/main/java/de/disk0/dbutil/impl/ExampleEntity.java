@@ -1,7 +1,7 @@
 package de.disk0.dbutil.impl;
 
-import javax.persistence.Column;
-import javax.persistence.Table;
+import jakarta.persistence.Column;
+import jakarta.persistence.Table;
 
 import de.disk0.dbutil.api.entities.BaseGuidEntity;
 
