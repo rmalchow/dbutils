@@ -8,7 +8,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 
 @Entity
-public class BaseGuidEntityV2 implements BaseGuidEntity {
+public class BaseGuidEntityV2 implements BaseGuidEntityV1 {
 
 	@Id
 	@Column(name = "id", unique = true, nullable = false)

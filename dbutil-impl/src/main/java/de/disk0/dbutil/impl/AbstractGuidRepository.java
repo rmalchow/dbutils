@@ -9,11 +9,11 @@ import org.springframework.util.StringUtils;
 
 import de.disk0.dbutil.api.IdGeneratorClass;
 import de.disk0.dbutil.api.IdGenerator;
-import de.disk0.dbutil.api.entities.BaseGuidEntity;
+import de.disk0.dbutil.api.entities.BaseGuidEntityV1;
 import de.disk0.dbutil.api.exceptions.SqlException;
 import de.disk0.dbutil.api.utils.IdGeneratorGuid;
 
-public abstract class AbstractGuidRepository<T extends BaseGuidEntity> extends AbstractRepository<T,String> implements RowMapper<T> {
+public abstract class AbstractGuidRepository<T extends BaseGuidEntityV1> extends AbstractRepository<T,String> implements RowMapper<T> {
 
 	private static Log log = LogFactory.getLog(AbstractGuidRepository.class);
 
