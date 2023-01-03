@@ -24,7 +24,7 @@ big thanks to everyone who has contributed to this, especially @mdjimy
 
 ### compatibility
 
-Supports Spring Boot 2.x - Spring Boot 3.x.
+Supports Spring Boot 2.x - Spring Boot 3.x. [starting from 0.2]
 
 Java 8 - Java 17. 
 
