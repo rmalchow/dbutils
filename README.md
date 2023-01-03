@@ -82,7 +82,7 @@ for a basic entity, extend `BasicGuidEntity` and annotate your class with `@Tabl
 
 ```java
 @Table(name="foo")
-public class Foo extends BaseGuidEntity {
+public class Foo extends BaseGuidEntityV1 {
 
 	/* no ID field, because the superclass has one already */
 	

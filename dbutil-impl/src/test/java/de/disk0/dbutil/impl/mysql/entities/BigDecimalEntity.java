@@ -2,13 +2,12 @@ package de.disk0.dbutil.impl.mysql.entities;
 
 import java.math.BigDecimal;
 
+import de.disk0.dbutil.api.entities.BaseGuidEntityV1;
 import jakarta.persistence.Column;
 import jakarta.persistence.Table;
 
-import de.disk0.dbutil.api.entities.BaseGuidEntity;
-
 @Table(name="bd")
-public class BigDecimalEntity extends BaseGuidEntity {
+public class BigDecimalEntity extends BaseGuidEntityV1 {
 	
 	@Column(name="dec")
 	private BigDecimal dec;

@@ -1,12 +1,11 @@
 package de.disk0.dbutil.impl.hund;
 
+import de.disk0.dbutil.api.entities.BaseGuidEntityV1;
 import jakarta.persistence.Column;
 import jakarta.persistence.Table;
 
-import de.disk0.dbutil.api.entities.BaseGuidEntity;
-
 @Table(name="hund")
-public class Hund extends BaseGuidEntity {
+public class Hund extends BaseGuidEntityV1 {
 
 	@Column(name="name")
 	private String name;

@@ -1,12 +1,11 @@
 package de.disk0.dbutil.impl.katze;
 
+import de.disk0.dbutil.api.entities.BaseGuidEntityV1;
 import jakarta.persistence.Column;
 import jakarta.persistence.Table;
 
-import de.disk0.dbutil.api.entities.BaseGuidEntity;
-
 @Table(name="katze")
-public class Katze extends BaseGuidEntity {
+public class Katze extends BaseGuidEntityV1 {
 	
 	public enum TYPE { MIEZE, SCHMUSE, RAUB };
 	

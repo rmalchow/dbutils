@@ -3,6 +3,7 @@ package de.disk0.dbutil.impl.mysql;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import de.disk0.dbutil.api.exceptions.SqlException;
@@ -10,8 +11,6 @@ import de.disk0.dbutil.impl.hund.Hund;
 import de.disk0.dbutil.impl.hund.HundRepository;
 import de.disk0.dbutil.impl.pets.Pet;
 import de.disk0.dbutil.impl.pets.PetRepository;
-
-import org.junit.Assert;
 
 public class MapNullTest extends TestBase {
 

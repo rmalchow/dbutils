@@ -9,7 +9,6 @@ import de.disk0.dbutil.api.Operator;
 import de.disk0.dbutil.api.Select;
 import de.disk0.dbutil.api.TableReference;
 import de.disk0.dbutil.api.exceptions.SqlException;
-import de.disk0.dbutil.impl.mysql.MysqlStatementBuilder;
 
 public class AggregateTest {
 

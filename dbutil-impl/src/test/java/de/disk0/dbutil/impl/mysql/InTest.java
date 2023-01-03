@@ -7,12 +7,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import de.disk0.dbutil.api.exceptions.SqlException;
 import de.disk0.dbutil.impl.hund.Hund;
 import de.disk0.dbutil.impl.hund.HundRepository;
-import org.junit.Assert;
 
 public class InTest extends TestBase {
 

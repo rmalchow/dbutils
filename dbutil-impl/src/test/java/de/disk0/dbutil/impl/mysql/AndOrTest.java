@@ -3,14 +3,12 @@ package de.disk0.dbutil.impl.mysql;
 import org.junit.Assert;
 import org.junit.Test;
 
-import de.disk0.dbutil.api.Aggregate;
 import de.disk0.dbutil.api.Comparator;
 import de.disk0.dbutil.api.Condition;
 import de.disk0.dbutil.api.Operator;
 import de.disk0.dbutil.api.Select;
 import de.disk0.dbutil.api.TableReference;
 import de.disk0.dbutil.api.exceptions.SqlException;
-import de.disk0.dbutil.impl.mysql.MysqlStatementBuilder;
 
 public class AndOrTest {
 

@@ -1,12 +1,11 @@
 package de.disk0.dbutil.impl;
 
+import de.disk0.dbutil.api.entities.BaseGuidEntityV1;
 import jakarta.persistence.Column;
 import jakarta.persistence.Table;
 
-import de.disk0.dbutil.api.entities.BaseGuidEntity;
-
 @Table(name="example")
-public class ExampleEntity extends BaseGuidEntity {
+public class ExampleEntity extends BaseGuidEntityV1 {
 
 	// @Column(name="id")
 	// private String id <--- already in super class. 
