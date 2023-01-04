@@ -15,7 +15,8 @@ import de.disk0.dbutil.impl.micrometer.MicrometerAdapter;
 import de.disk0.dbutil.impl.util.PersistenceApiUtils;
 import javax.sql.DataSource;
 
-import lombok.extern.apachecommons.CommonsLog;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -26,8 +27,9 @@ import de.disk0.dbutil.api.exceptions.SqlException;
 import de.disk0.dbutil.impl.util.ParsedEntity;
 import de.disk0.dbutil.impl.util.ParsedEntity.ParsedColumn;
 
-@CommonsLog
 public abstract class AbstractMappingRepository<T> implements RowMapper<T> {
+
+	private static Log log = LogFactory.getLog(AbstractMappingRepository.class);
 
 	protected ParsedEntity<T> pe;
 	
