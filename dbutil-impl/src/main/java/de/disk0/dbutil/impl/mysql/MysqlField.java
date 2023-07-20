@@ -80,6 +80,8 @@ public class MysqlField implements Field {
 		} else if(aggregate==Aggregate.DISTINCT) {
 			parts2.add("DISTINCT");
 			parts2.add(t);
+		} else if(aggregate==Aggregate.RANDOM) {
+			parts2.add("RAND()");
 		} else if(
 				aggregate==Aggregate.AVG ||
 				aggregate==Aggregate.MIN ||

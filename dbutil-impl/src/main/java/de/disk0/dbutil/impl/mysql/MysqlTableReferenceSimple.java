@@ -138,6 +138,11 @@ public class MysqlTableReferenceSimple implements TableReference {
 	}
 	
 	@Override
+	public Field random() {
+		return new MysqlField(Aggregate.RANDOM);
+	}
+	
+	@Override
 	public Field field(Aggregate a, String fieldname) {
 		return new MysqlField(a, this, fieldname);
 	}

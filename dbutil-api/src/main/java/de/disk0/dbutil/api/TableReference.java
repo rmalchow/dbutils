@@ -16,6 +16,7 @@ public interface TableReference extends SqlFragment {
 	JoinTable leftOuterJoin(Class<? extends BaseEntity<?>> table);
 
 	Field field(String fieldname);
+	Field random();
 	Field value(Object value);
 	Field value(Object value, String name);
 	Field field(Aggregate a, Field... fr);

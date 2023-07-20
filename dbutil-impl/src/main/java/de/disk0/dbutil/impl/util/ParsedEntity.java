@@ -7,10 +7,10 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.disk0.dbutil.impl.util.PersistenceApiUtils.Column;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import de.disk0.dbutil.impl.util.PersistenceApiUtils.Column;
 
 public class ParsedEntity<T> {
 	
@@ -23,16 +23,21 @@ public class ParsedEntity<T> {
 		Class<?> c = clazz;
 		List<String> x = new ArrayList<>();
 		do {
+			
 			for(Field f : c.getDeclaredFields()) {
 				if(x.contains(f.getName())) continue;
+				
 				x.add(f.getName());
 				Column column = PersistenceApiUtils.getColumn(f);
 				if(column!=null) {
+					log.debug("found a field: "+f.getName());
 					String name = f.getName();
 					if(!column.getName().equals("")) {
 						name = column.getName();
 					}
 					columns.add(new ParsedColumn(f, name, column.isInsertable(), column.isUpdatable()));
+				} else {
+					log.debug("found a non-field: "+f.getName());
 				}
 			}
 			c = c.getSuperclass();
