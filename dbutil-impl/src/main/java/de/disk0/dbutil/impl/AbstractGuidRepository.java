@@ -94,6 +94,11 @@ public abstract class AbstractGuidRepository<T extends BaseGuidEntityV1> extends
 					log.debug("UPDATE: "+params.getValues());
 				}
 				int done = templ.update(sql, params);
+				if(done < 1) {
+					throw new SqlException("expecting row update, but nothing happened", null);
+				} else if (done > 1) {
+					throw new SqlException("expecting ONE row update, but more than one row was updated", null);
+				}
 				log.debug("saving entity: "+done+" rows updated");
 			}
 			log.debug("saving entity: calling after save ... ");
