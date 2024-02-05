@@ -1,15 +1,20 @@
 package de.disk0.dbutil.impl.util;
 
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import de.disk0.dbutil.api.exceptions.SqlException;
 import de.disk0.dbutil.impl.util.PersistenceApiUtils.Column;
 
 public class ParsedEntity<T> {
@@ -125,7 +130,27 @@ public class ParsedEntity<T> {
 						}
 					}
 				} else {
-					field.set(target, rs.getObject(column));
+					try {
+						Object o = rs.getObject(column);
+						if (o !=null && o.getClass().getName().compareTo("org.mariadb.jdbc.MariaDbBlob")==0) {
+							Class c = Class.forName("org.mariadb.jdbc.MariaDbBlob");
+							try {
+								Method ms = c.getMethod("getBinaryStream");
+								InputStream is = (InputStream)ms.invoke(o);
+								ByteArrayOutputStream baos = new ByteArrayOutputStream();
+								IOUtils.copy(is, baos);
+								byte[] buff = baos.toByteArray();
+								field.set(target, buff);
+							} catch (Exception e) {
+								throw new SqlException("implicit mariadb conversion failed", e);
+							}
+						} else {
+							field.set(target, o);
+						}
+					} catch (Exception e) {
+						log.warn("mapping "+field.getName()+" ("+rs.getObject(column).getClass().getCanonicalName()+")",e);
+						throw new SqlException("error mapping field", e);
+					}
 				}
 				
 				log.debug("mapping column: "+column+" - "+rs.getObject(column));
