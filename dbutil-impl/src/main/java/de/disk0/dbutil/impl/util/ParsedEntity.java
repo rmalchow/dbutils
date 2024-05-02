@@ -91,12 +91,19 @@ public class ParsedEntity<T> {
 					field.set(target,rs.getString(column));
 
 				} else if(field.getType()==BigDecimal.class) {
-					field.set(target,rs.getBigDecimal(column));
-
+					String s = rs.getString(column);
+					if(s == null) {
+						field.set(target,null);
+					} else {
+						field.set(target,new BigDecimal(s));
+					}
 				} else if(field.getType()==BigInteger.class) {
-				
-					field.set(target,new BigInteger(rs.getString(column)));
-
+					String s = rs.getString(column);
+					if(s == null) {
+						field.set(target,null);
+					} else {
+						field.set(target,new BigInteger(s));
+					}
 				} else if(field.getType()==Integer.class || field.getType()==Integer.TYPE) {
                     int value = rs.getInt(column);
                     if (field.getType().isPrimitive() && rs.wasNull()) {
