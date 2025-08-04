@@ -6,7 +6,7 @@ import java.util.Date;
 
 public class FormatUtil {
 
-	private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 
 	public static Object resolve(Object value) {
 		if(value instanceof Boolean) {
