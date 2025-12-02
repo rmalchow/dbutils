@@ -144,7 +144,13 @@ public abstract class AbstractMappingRepository<T> implements RowMapper<T> {
 			long start = System.currentTimeMillis();
 			log.debug("-------- query: "+sql+" / "+params);
 			List<T> out = t.query(sql, params, this);
-			log.debug("-------- found: "+out.size()+" / "+(System.currentTimeMillis()-start)+"ms");
+			if(System.currentTimeMillis()-start > 1000) {
+				log.warn("VERY SLOW: "+out.size()+" / "+(System.currentTimeMillis()-start)+"ms");
+			} else if(System.currentTimeMillis()-start > 500) {
+				log.info("     SLOW: "+out.size()+" / "+(System.currentTimeMillis()-start)+"ms");
+			} else {
+				log.debug("  NORMAL: "+out.size()+" / "+(System.currentTimeMillis()-start)+"ms");
+			}
 			return out;
 		} catch (Exception e) {
 			log.warn("-------- query failed: "+sql+" / "+params,e);
