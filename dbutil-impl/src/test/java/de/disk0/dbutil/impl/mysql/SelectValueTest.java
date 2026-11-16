@@ -1,7 +1,7 @@
 package de.disk0.dbutil.impl.mysql;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import de.disk0.dbutil.api.Aggregate;
 import de.disk0.dbutil.api.Comparator;
@@ -21,7 +21,7 @@ public class SelectValueTest {
 		
 		s.addSelect(t.value("foo"), "bar");
 		
-		Assert.assertEquals("foo", s.getParams().get("value_1"));
+		Assertions.assertEquals("foo", s.getParams().get("value_1"));
 		
 		System.err.print(s.getSql());
 		
@@ -34,7 +34,7 @@ public class SelectValueTest {
 		
 		s.addSelect(Aggregate.COUNT, "bar", t.value("foo"));
 		
-		Assert.assertEquals("foo", s.getParams().get("value_1"));
+		Assertions.assertEquals("foo", s.getParams().get("value_1"));
 		
 		System.err.print(s.getSql());
 		
@@ -65,8 +65,8 @@ public class SelectValueTest {
 		System.err.println("----");
 		System.err.println(ss.getParams());
 
-		Assert.assertEquals(1, ss.getParams().get("value_1"));
-		Assert.assertEquals("foo", s.getParams().get("value_2"));
+		Assertions.assertEquals(1, ss.getParams().get("value_1"));
+		Assertions.assertEquals("foo", s.getParams().get("value_2"));
 		
 		
 	}
@@ -77,7 +77,7 @@ public class SelectValueTest {
 		TableReference t = s.fromTable("hund");
 
 		s.condition(Operator.AND,t.field("id"), Comparator.EQ, t.value(123,"id"));
-		Assert.assertEquals("SELECT * FROM `hund` `hund_1` WHERE `hund_1`.`id` = :id_1", s.getSql());
+		Assertions.assertEquals("SELECT * FROM `hund` `hund_1` WHERE `hund_1`.`id` = :id_1", s.getSql());
 
 	}
 	

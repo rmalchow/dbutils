@@ -1,11 +1,11 @@
 package de.disk0.dbutil.impl.pets;
 
-import de.disk0.dbutil.api.entities.BaseGuidEntityV1;
+import de.disk0.dbutil.api.entities.BaseGuidEntityV2;
 import jakarta.persistence.Column;
 import jakarta.persistence.Table;
 
 @Table(name="pet")
-public class Pet extends BaseGuidEntityV1 {
+public class Pet extends BaseGuidEntityV2 {
 	
 	@Column(name="age")
 	private Integer age;

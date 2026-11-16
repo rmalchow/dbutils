@@ -1,23 +1,24 @@
 package de.disk0.dbutil.impl;
 
-import java.lang.reflect.ParameterizedType;
 import java.security.InvalidParameterException;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-import de.disk0.dbutil.impl.micrometer.MicrometerAdapter;
 import de.disk0.dbutil.impl.util.PersistenceApiUtils;
+import de.disk0.dbutil.impl.util.SqlLog;
+import io.micrometer.observation.Observation;
+import io.micrometer.observation.ObservationRegistry;
 import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ResolvableType;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -35,18 +36,25 @@ public abstract class AbstractMappingRepository<T> implements RowMapper<T> {
 	
 	protected Class<T> clazz;
 	
-	private List<String> applicableColumns;
-	
 	@Autowired
 	private NamedParameterJdbcTemplate template;
 
+	private ObservationRegistry observationRegistry = ObservationRegistry.NOOP;
+	
 	@Autowired(required = false)
-	private MicrometerAdapter micrometerAdapter;
+	public void setObservationRegistry(ObservationRegistry observationRegistry) {
+		this.observationRegistry = observationRegistry;
+	}
 	
 	@SuppressWarnings("unchecked")
 	protected Class<T> getClazz() {
 		if(clazz==null) {
-			clazz = (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+			// not GenericTypeResolver.resolveTypeArgument: for a raw subclass it returns T's bound instead of null
+			ResolvableType rt = ResolvableType.forClass(getClass()).as(AbstractMappingRepository.class);
+			if(rt.hasUnresolvableGenerics() || rt.resolveGeneric(0)==null) {
+				throw new IllegalStateException("cannot resolve entity type of " + getClass());
+			}
+			clazz = (Class<T>) rt.resolveGeneric(0);
 		}
 		return clazz;
 	}
@@ -94,16 +102,13 @@ public abstract class AbstractMappingRepository<T> implements RowMapper<T> {
 	@Override
 	public T mapRow(ResultSet rs, int c) throws SQLException {
 		try {
-			if(applicableColumns==null) {
-				synchronized (this) {
-					applicableColumns = new ArrayList<>();
-					for(int i=0;i<rs.getMetaData().getColumnCount();i++) {
-						applicableColumns.add(rs.getMetaData().getColumnLabel(i+1).toUpperCase());
-					}
-				}
+			ResultSetMetaData rsmd = rs.getMetaData();
+			Set<String> applicableColumns = new HashSet<>();
+			for(int i=0;i<rsmd.getColumnCount();i++) {
+				applicableColumns.add(rsmd.getColumnLabel(i+1).toUpperCase());
 			}
 			
-			T out = getClazz().newInstance();
+			T out = getClazz().getDeclaredConstructor().newInstance();
 			for(ParsedColumn pc : getParsedEntity().getColumns()) {
 				log.debug("parsing: "+pc.getColumnName());
 				if(!applicableColumns.contains(pc.getColumnName().toUpperCase())) {
@@ -138,34 +143,31 @@ public abstract class AbstractMappingRepository<T> implements RowMapper<T> {
 	}
 	
 	public List<T> find(String sql, Map<String,Object> params) throws SqlException {
-		Instant timerStart = Instant.now();
+		return Observation.createNotStarted("dbutil.sql.find", observationRegistry)
+			.lowCardinalityKeyValue("object", getClazz().getSimpleName())
+			.observeChecked(() -> doFind(sql, params));
+	}
+	
+	private List<T> doFind(String sql, Map<String,Object> params) throws SqlException {
+		String entity = getClazz().getSimpleName();
 		try {
 			NamedParameterJdbcTemplate t = getTemplate();
 			long start = System.currentTimeMillis();
-			log.debug("-------- query: "+sql+" / "+params);
+			log.debug("-------- query: "+sql+" params="+SqlLog.names(params));
+			SqlLog.values(entity, params);
 			List<T> out = t.query(sql, params, this);
-			if(System.currentTimeMillis()-start > 1000) {
-				log.warn("VERY SLOW: "+out.size()+" / "+(System.currentTimeMillis()-start)+"ms");
-				log.info("VERY SLOW: "+sql);
-			} else if(System.currentTimeMillis()-start > 500) {
-				log.info("     SLOW: "+out.size()+" / "+(System.currentTimeMillis()-start)+"ms");
-				log.info("     SLOW: "+sql);
+			long ms = System.currentTimeMillis()-start;
+			if(ms > 1000) {
+				log.warn("VERY SLOW: "+ms+"ms, "+out.size()+" rows, "+entity+": "+sql+" params="+SqlLog.names(params));
+			} else if(ms > 500) {
+				log.info("     SLOW: "+ms+"ms, "+out.size()+" rows, "+entity+": "+sql+" params="+SqlLog.names(params));
 			} else {
-				log.debug("  NORMAL: "+out.size()+" / "+(System.currentTimeMillis()-start)+"ms");
+				log.debug("  NORMAL: "+ms+"ms, "+out.size()+" rows");
 			}
 			return out;
 		} catch (Exception e) {
-			log.warn("-------- query failed: "+sql+" / "+params,e);
+			log.warn("-------- query failed: "+sql+" params="+SqlLog.names(params),e);
 			throw new SqlException("SQL.REPO.LIST_FAILED",new Object[] { e.getMessage() },  e);
-		} finally {
-			if (micrometerAdapter != null) {
-				Instant timerEnd = Instant.now();
-				micrometerAdapter.record(
-						Duration.between(timerStart, timerEnd),
-						"dbutil.sql.find",
-						MicrometerAdapter.Tag.of("object", getClazz().getSimpleName())
-				);
-			}
 		}
 	}
 
@@ -183,7 +185,7 @@ public abstract class AbstractMappingRepository<T> implements RowMapper<T> {
 			if(out.size()==0) return null;
 			if(out.size()==1) return out.get(0);
 		} catch (Exception e) {
-			log.warn("-------- query failed: "+sql+" / "+params,e);
+			log.warn("-------- query failed: "+sql+" params="+SqlLog.names(params),e);
 			throw new SqlException("SQL.REPO.LIST_FAILED",new Object[] { e.getMessage() },  e);
 		}
 		throw PersistenceApiUtils.nonUniqueResultException();
@@ -201,10 +203,11 @@ public abstract class AbstractMappingRepository<T> implements RowMapper<T> {
 	public int delete(String sql, Map<String,Object> params) throws SqlException {
 		try {
 			NamedParameterJdbcTemplate templ = getTemplate();
-			log.debug("-------- update: "+sql+" / "+params);
+			log.debug("-------- delete: "+sql+" params="+SqlLog.names(params));
+			SqlLog.values(getClazz().getSimpleName(), params);
 			return templ.update(sql, params);
 		} catch (Exception e) {
-			log.warn("-------- delete failed: "+sql+" / "+params,e);
+			log.warn("-------- delete failed: "+sql+" params="+SqlLog.names(params),e);
 			throw new SqlException("SQL.REPO.DELETE_FAILED",new Object[] { e.getMessage() },  e);
 		}
 	}
@@ -212,10 +215,11 @@ public abstract class AbstractMappingRepository<T> implements RowMapper<T> {
 	public int update(String sql, Map<String,Object> params) throws SqlException {
 		try {
 			NamedParameterJdbcTemplate templ = getTemplate();
-			log.debug("-------- update: "+sql+" / "+params);
+			log.debug("-------- update: "+sql+" params="+SqlLog.names(params));
+			SqlLog.values(getClazz().getSimpleName(), params);
 			return templ.update(sql, params);
 		} catch (Exception e) {
-			log.warn("-------- delete failed: "+sql+" / "+params,e);
+			log.warn("-------- update failed: "+sql+" params="+SqlLog.names(params),e);
 			throw new SqlException("SQL.REPO.DELETE_FAILED",new Object[] { e.getMessage() },  e);
 		}
 	}

@@ -3,8 +3,8 @@ package de.disk0.dbutil.impl.mysql;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import de.disk0.dbutil.api.exceptions.SqlException;
 import de.disk0.dbutil.impl.hund.Hund;
@@ -27,13 +27,13 @@ public class MapNullTest extends TestBase {
 
 		Hund h = new Hund();
 		h = hr.save(h);
-		Assert.assertNotNull(h);
-		Assert.assertNotNull(h.getId());
-		Assert.assertNull(h.getName());
+		Assertions.assertNotNull(h);
+		Assertions.assertNotNull(h.getId());
+		Assertions.assertNull(h.getName());
 		
 		h.setName("hund");
 		h = hr.save(h);
-		Assert.assertNotNull(h.getName());
+		Assertions.assertNotNull(h.getName());
 	}
 	
 	
@@ -48,7 +48,7 @@ public class MapNullTest extends TestBase {
 		
 		Pet p2 = pr.get(id);
 
-		Assert.assertNull(p2.getAge());
+		Assertions.assertNull(p2.getAge());
 		
 	}
 
@@ -73,11 +73,11 @@ public class MapNullTest extends TestBase {
 			e = e2;
 		}
 		
-		Assert.assertNotNull(e);
+		Assertions.assertNotNull(e);
 		
 		e.printStackTrace();
 		
-		Assert.assertEquals("Cannot set NULL value to field with type int", e.getCause().getCause().getCause().getCause().getCause().getMessage());
+		Assertions.assertEquals("Cannot set NULL value to field with type int", e.getCause().getCause().getCause().getCause().getCause().getMessage());
 		
 	}
 	

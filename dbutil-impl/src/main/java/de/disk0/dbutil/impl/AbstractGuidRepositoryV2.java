@@ -12,6 +12,7 @@ import de.disk0.dbutil.api.IdGenerator;
 import de.disk0.dbutil.api.entities.BaseGuidEntityV2;
 import de.disk0.dbutil.api.exceptions.SqlException;
 import de.disk0.dbutil.api.utils.IdGeneratorGuid;
+import de.disk0.dbutil.impl.util.SqlLog;
 
 public abstract class AbstractGuidRepositoryV2<T extends BaseGuidEntityV2> extends AbstractRepository<T,String> implements RowMapper<T> {
 
@@ -37,7 +38,7 @@ public abstract class AbstractGuidRepositoryV2<T extends BaseGuidEntityV2> exten
 			}
 			if(ggc!=null) {
 				log.info("instantiating GUID generator ... instance: "+gc.value());
-				idg = ggc.newInstance();
+				idg = ggc.getDeclaredConstructor().newInstance();
 			}
 			if(idg == null) {
 				idg = new IdGeneratorGuid();
@@ -66,7 +67,7 @@ public abstract class AbstractGuidRepositoryV2<T extends BaseGuidEntityV2> exten
 		try {
 			beforeSave(t);
 			templ = getTemplate();
-			if(StringUtils.isEmpty(t.getId())) {
+			if(!StringUtils.hasLength(t.getId())) {
 				t.setId(uuid);
 				String sql = getInsertOneStatement();
 				
@@ -74,14 +75,14 @@ public abstract class AbstractGuidRepositoryV2<T extends BaseGuidEntityV2> exten
 				if(log.isDebugEnabled()) {
 					log.debug("saving entity: insert! ("+getClazz().getSimpleName()+")");
 					log.debug("INSERT: "+sql);
-					log.debug("INSERT: "+params.getValues());
+					log.debug("INSERT: "+SqlLog.names(params.getValues()));
 				}
+				SqlLog.values(getClazz().getSimpleName(), params.getValues());
 				try {
 					int done = templ.update(sql, params);
 					log.debug("saving entity: "+done+" rows inserted");
 				} catch (Exception e) {
-					log.warn("saving failed: "+(sql));
-					log.warn("saving failed: "+(params));
+					log.warn("saving failed: "+sql+" params="+SqlLog.names(params.getValues()));
 					throw e;
 					
 				}
@@ -91,9 +92,16 @@ public abstract class AbstractGuidRepositoryV2<T extends BaseGuidEntityV2> exten
 				if(log.isDebugEnabled()) {
 					log.debug("saving entity: update!");
 					log.debug("UPDATE: "+sql);
-					log.debug("UPDATE: "+params.getValues());
+					log.debug("UPDATE: "+SqlLog.names(params.getValues()));
 				}
-				int done = templ.update(sql, params);
+				SqlLog.values(getClazz().getSimpleName(), params.getValues());
+				int done;
+				try {
+					done = templ.update(sql, params);
+				} catch (Exception e) {
+					log.warn("saving failed: "+sql+" params="+SqlLog.names(params.getValues()));
+					throw e;
+				}
 				if(done < 1) {
 					throw new SqlException("expecting row update, but nothing happened", null);
 				} else if (done > 1) {
@@ -104,7 +112,7 @@ public abstract class AbstractGuidRepositoryV2<T extends BaseGuidEntityV2> exten
 			log.debug("saving entity: calling after save ... ");
 			afterSave(t);
 			log.debug("saving entity: calling after save ... done!");
-			log.debug("saving entity: retrieving object as saved: >>>"+t.getId()+"<<< ("+getClazz().getSimpleName()+")");
+			log.debug("saving entity: retrieving object as saved: ("+getClazz().getSimpleName()+")");
 			T out = get(t.getId());
 			log.debug("saving entity: retrieving object as saved: "+(out==null?"NULL":"FOUND"));
 			return out;

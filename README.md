@@ -10,7 +10,7 @@ i have been using (and improving) it for quite a while now, and found it useful 
 
 i started this mostly out of lazyness. i didn't want the complexity of full blown JPA criteria, and i also wanted less runtim magic than what spring data repositories do. for me, this library is a good balance between simplicity and minimizing boilerplate code. basically, once the entity is defined, the only thing i have to deal with the code to find specific entries (more on the pattern i use below).
 
-this uses `java.sql.DataSource` and `NamedParameterJdbcTemplate` from spring-jdbc, the annotations from `javax.persistence` or `jakarta.persistence`, and plain reflection to do the actual mapping. it can currently map most standard field types (including enums).
+this uses `java.sql.DataSource` and `NamedParameterJdbcTemplate` from spring-jdbc, the annotations from `jakarta.persistence`, and plain reflection to do the actual mapping. it can currently map most standard field types (including enums).
 
 it also offers pretty extensive and direct control over the SQL that is produced.
 
@@ -24,26 +24,14 @@ big thanks to everyone who has contributed to this, especially @mdjimy
 
 ### compatibility
 
-Supports Spring Boot 2.x - Spring Boot 3.x. [starting from 0.2]
+Spring Boot 3.5 and 4.0, Java 25 or later, `jakarta.persistence` only. [0.3.0 and later]
 
-Java 8 - Java 17. 
-
-Both Javax and Jakarta Persistence API are supported
+if you are on older setups (Java 8 - 17, Spring Boot 2.x, `javax.persistence`), stay on 0.2.x. see "migrating from 0.2.x" below.
 
 
 ### dependencies
 
-this has very few dependencies - and thanks to @mdjimy, there are even less from > 0.52. the few things you DO need are as these:
-
-since the JPA APIs are a big mess, packaging wise, and we only really need a handful of annotations from there, Persistence API , it is now set to "optional" - so you will have to pick your poison. i normally use:
-
-```xml
-<dependency>
-    <groupId>jakarta.persistence</groupId>
-    <artifactId>jakarta.persistence-api</artifactId>
-    <version>2.2</version>
-</dependency>
-```
+this has very few dependencies. `jakarta.persistence-api` now comes with dbutils, so there is nothing to pick anymore.
 
 in places where you want to do annotations or extend some of the base classes, but not actually pull in any implementations, you can do:
 
@@ -51,6 +39,7 @@ in places where you want to do annotations or extend some of the base classes, b
 <dependency>
     <groupId>de.disk0.dbutil</groupId>
     <artifactId>dbutil-api</artifactId>
+    <version>0.3.0</version>
 </dependency>
 ```
 
@@ -60,6 +49,7 @@ and then, where you actually need the statement builder implementation:
 <dependency>
     <groupId>de.disk0.dbutil</groupId>
     <artifactId>dbutil-impl</artifactId>
+    <version>0.3.0</version>
 </dependency>
 ```
 
@@ -78,11 +68,11 @@ don't forget to also pull in your JDBC and configure springboot to make a DataSo
 
 ### basic mapping
 
-for a basic entity, extend `BasicGuidEntity` and annotate your class with `@Table` and `@Column` annotations:
+for a basic entity, extend `BaseGuidEntityV2` and annotate your class with `@Table` and `@Column` annotations:
 
 ```java
 @Table(name="foo")
-public class Foo extends BaseGuidEntityV1 {
+public class Foo extends BaseGuidEntityV2 {
 
 	/* no ID field, because the superclass has one already */
 	
@@ -109,12 +99,12 @@ public class Foo extends BaseGuidEntityV1 {
 
 ### repository
 
-With a basic entity like this, you can extend `AbstractGuidRepository` to have basic functionality:
+With a basic entity like this, you can extend `AbstractGuidRepositoryV2` to have basic functionality:
 
 ```java
 
 @Repository // add spring annotations if you want
-public FooRepository extends AbstractGuidRepository<Foo> {
+public FooRepository extends AbstractGuidRepositoryV2<Foo> {
 
 }
 ```
@@ -301,6 +291,87 @@ WHERE
 		)
 	)
 ```
+
+
+### logging
+
+dbutils logs through `commons-logging` (what spring uses anyway), so it ends up wherever your other logs go. the rule is simple: the SQL, the duration, the row count, the entity class and the parameter **names** are logged on the normal loggers (`de.disk0.dbutil.impl.*`). parameter **values** are never logged there.
+
+| what | level | example |
+|---|---|---|
+| `find` takes more than 1000 ms | WARN | `VERY SLOW: 1834ms, 12 rows, UserEntity: SELECT ... params=[email, unitId]` |
+| `find` takes more than 500 ms | INFO | `SLOW: 712ms, 12 rows, UserEntity: SELECT ... params=[email, unitId]` |
+| any query fails (`find`, `findOne`, `get`, `update`, `delete`, `save`) | WARN | `query failed: <sql> params=[email]`, with the exception |
+| every `find`, `update`, `save`, column mapping | DEBUG | SQL and parameter / column names only |
+
+the thresholds are hard-coded.
+
+if you do want the values (to reproduce a slow query, say), set the logger `de.disk0.dbutil.sql.params` to TRACE. you then get one more line per statement, e.g. `params UserEntity: {email=jane@example.org, unitId=42}`.
+
+**warning: this writes personal data (whatever is in your parameters: emails, names, ids, ...) to your logs. don't leave it on in production, and don't ship those logs anywhere you wouldn't ship the data itself.**
+
+two limits you should know about:
+
+- when a statement fails, the driver's exception message is passed on as the cause of the `SqlException`, and some drivers put values in there (mariadb: `Duplicate entry 'jane@example.org' for key 'email'`). if you log that exception, you log the value. dbutils can't rewrite that without losing information.
+- the query builder (below) binds every value as a named parameter, so values never end up in the SQL text. but `SimpleQuery` and `find(sql, params)` take SQL that *you* write. use `:named` parameters there and never concatenate values (`"... WHERE email = '" + email + "'"`) - besides being an injection hole, that puts the value into every log line that contains the SQL.
+
+
+
+### metrics
+
+every `find` is wrapped in a micrometer observation named `dbutil.sql.find`, with the low-cardinality key `object` set to the entity's simple class name (e.g. `object=UserEntity`). what that turns into depends on your setup: with spring boot actuator you get a timer `dbutil.sql.find` tagged `object` (plus `error`, and a `dbutil.sql.find.active` long task timer), with tracing configured you get a span per query, without any handlers nothing happens.
+
+the observation is on whenever an `ObservationRegistry` bean exists, there is no property for it. if you create repositories by hand (with `new`, no spring context), give them the registry yourself:
+
+```java
+FooRepository r = new FooRepository();
+r.setDataSource(dataSource);
+r.setObservationRegistry(observationRegistry);
+```
+
+without it, `find` works the same and simply doesn't record anything.
+
+to switch it off, register an `ObservationPredicate` that rejects the name:
+
+```java
+@Bean
+ObservationPredicate noDbutilObservations() {
+    return (name, context) -> !name.startsWith("dbutil.");
+}
+```
+
+
+
+### migrating from 0.2.x
+
+- Java 25 or later is required.
+- `BaseEntityV1`, `BaseGuidEntityV1` and `AbstractGuidRepository` (the `javax.persistence` ones) are removed. use `BaseGuidEntityV2` and `AbstractGuidRepositoryV2`.
+- `javax.persistence` is no longer supported, `jakarta.persistence` only.
+- the `dbutil.micrometer.enabled` property is gone; metrics now go through the observation api (see "metrics"). if you had it unset and don't want the metrics now, add the `ObservationPredicate`.
+- `ReaderConfig` is removed.
+- log format changed: the old two-line `VERY SLOW` output is now one line with timing, rows, entity and parameter names, and parameter values are no longer logged unless you enable `de.disk0.dbutil.sql.params`. check any alerts or log searches that match on the old text.
+
+
+
+### build
+
+the root pom imports the spring boot BOM through the property `springboot.version`.
+
+```sh
+mvn verify                                  # builds and tests against Spring Boot 3.5
+mvn -Dspringboot.version=<4.0.x> verify     # same, against Spring Boot 4
+```
+
+there is one test that needs a real MariaDB (the H2 used elsewhere doesn't return `java.sql.Blob`): `MariaDbBlobTest`. it is skipped unless you give it a JDBC url in the system property `dbutil.it.mariadb.url`:
+
+```sh
+docker run -d --rm --name dbutil-mariadb -p 33306:3306 \
+  -e MARIADB_ROOT_PASSWORD=test -e MARIADB_DATABASE=dbutil mariadb:11
+mvn -pl dbutil-impl -am test -Dtest=MariaDbBlobTest -Dsurefire.failIfNoSpecifiedTests=false \
+  -Ddbutil.it.mariadb.url='jdbc:mariadb://localhost:33306/dbutil?user=root&password=test'
+```
+
+to run it with another driver version (say the old 2.6.2), add `-Dmariadb.test.version=2.6.2`.
 
 
 

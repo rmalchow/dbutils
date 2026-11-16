@@ -4,8 +4,8 @@ import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import de.disk0.dbutil.api.exceptions.SqlException;
 import de.disk0.dbutil.impl.mysql.entities.BigDecimalEntity;
@@ -29,12 +29,12 @@ public class MapBigDecimalTest extends TestBase {
 		bde.setDec(new BigDecimal("999900.0009"));
 		bde = r.save(bde);
 		bde2 = r.get(bde.getId());
-		Assert.assertEquals("999900.0009", bde2.getDec().toPlainString());
+		Assertions.assertEquals("999900.0009", bde2.getDec().toPlainString());
 		
 		bde.setDec(new BigDecimal("99900.00091"));
 		bde = r.save(bde);
 		bde2 = r.get(bde.getId());
-		Assert.assertEquals("99900.0009", bde2.getDec().toPlainString());
+		Assertions.assertEquals("99900.0009", bde2.getDec().toPlainString());
 		
 		
 	}

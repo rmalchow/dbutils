@@ -1,7 +1,7 @@
 package de.disk0.dbutil.impl.mysql;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import de.disk0.dbutil.api.Comparator;
 import de.disk0.dbutil.api.Operator;
@@ -22,7 +22,7 @@ public class UnionTest {
 		TableReference t2 = s2.fromTable("katze");
 		s2.condition(Operator.AND, t2.field("id"), Comparator.EQ, t2.value("2"));
 		
-		Assert.assertEquals("(SELECT * FROM `hund` `hund_1` WHERE `hund_1`.`id` = :value_1) UNION (SELECT * FROM `katze` `katze_1` WHERE `katze_1`.`id` = :value_2)", s.getSql());
+		Assertions.assertEquals("(SELECT * FROM `hund` `hund_1` WHERE `hund_1`.`id` = :value_1) UNION (SELECT * FROM `katze` `katze_1` WHERE `katze_1`.`id` = :value_2)", s.getSql());
 		
 		
 	}

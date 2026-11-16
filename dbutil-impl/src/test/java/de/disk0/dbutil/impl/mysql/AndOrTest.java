@@ -1,7 +1,7 @@
 package de.disk0.dbutil.impl.mysql;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import de.disk0.dbutil.api.Comparator;
 import de.disk0.dbutil.api.Condition;
@@ -17,13 +17,13 @@ public class AndOrTest {
 		Select s = new MysqlStatementBuilder().createSelect();
 		TableReference t = s.fromTable("hund");
 		s.condition(Operator.AND, t.field("id"), Comparator.EQ, t.value("1"));
-		Assert.assertEquals("SELECT * FROM `hund` `hund_1` WHERE `hund_1`.`id` = :value_1", s.getSql());
+		Assertions.assertEquals("SELECT * FROM `hund` `hund_1` WHERE `hund_1`.`id` = :value_1", s.getSql());
 		
 		Condition c = s.condition(Operator.AND, t.field("id"), Comparator.EQ, t.value("2"));
-		Assert.assertEquals("SELECT * FROM `hund` `hund_1` WHERE (`hund_1`.`id` = :value_1 AND `hund_1`.`id` = :value_2)", s.getSql());
+		Assertions.assertEquals("SELECT * FROM `hund` `hund_1` WHERE (`hund_1`.`id` = :value_1 AND `hund_1`.`id` = :value_2)", s.getSql());
 		
 		c.condition(Operator.OR, t.field("id"), Comparator.EQ, t.value("3"));
-		Assert.assertEquals("SELECT * FROM `hund` `hund_1` WHERE (`hund_1`.`id` = :value_1 AND (`hund_1`.`id` = :value_2 OR `hund_1`.`id` = :value_3))", s.getSql());
+		Assertions.assertEquals("SELECT * FROM `hund` `hund_1` WHERE (`hund_1`.`id` = :value_1 AND (`hund_1`.`id` = :value_2 OR `hund_1`.`id` = :value_3))", s.getSql());
 		
 		
 	}
@@ -33,7 +33,7 @@ public class AndOrTest {
 		Select s = new MysqlStatementBuilder().createSelect();
 		TableReference t = s.fromTable("hund");
 		s.condition(Operator.AND).condition(Operator.AND).condition(Operator.AND);
-		Assert.assertEquals("SELECT * FROM `hund` `hund_1`", s.getSql());
+		Assertions.assertEquals("SELECT * FROM `hund` `hund_1`", s.getSql());
 	}
 	
 	@Test
@@ -46,7 +46,7 @@ public class AndOrTest {
 		Condition c3 = s.condition(Operator.OR);
 		c3.condition(Operator.AND, t.field("id"), Comparator.EQ, t.field("id3"));
 		//s.condition().condition().condition();
-		Assert.assertEquals("SELECT * FROM `hund` `hund_1` WHERE (`hund_1`.`id` = `hund_1`.`id1` OR `hund_1`.`id` = `hund_1`.`id3`)", s.getSql());
+		Assertions.assertEquals("SELECT * FROM `hund` `hund_1` WHERE (`hund_1`.`id` = `hund_1`.`id1` OR `hund_1`.`id` = `hund_1`.`id3`)", s.getSql());
 	}
 	
 	@Test
@@ -61,7 +61,7 @@ public class AndOrTest {
 		Condition c3 = s.condition(Operator.OR);
 		c3.condition(Operator.AND, t.field("id"), Comparator.EQ, t.field("id3"));
 		//s.condition().condition().condition();
-		Assert.assertEquals("SELECT * FROM `hund` `hund_1` WHERE (`hund_1`.`id` = `hund_1`.`id1` AND (`hund_1`.`id` = `hund_1`.`id2` AND `hund_1`.`id` = `hund_1`.`id2b`) OR `hund_1`.`id` = `hund_1`.`id3`)", s.getSql());
+		Assertions.assertEquals("SELECT * FROM `hund` `hund_1` WHERE (`hund_1`.`id` = `hund_1`.`id1` AND (`hund_1`.`id` = `hund_1`.`id2` AND `hund_1`.`id` = `hund_1`.`id2b`) OR `hund_1`.`id` = `hund_1`.`id3`)", s.getSql());
 	}
 	
 }

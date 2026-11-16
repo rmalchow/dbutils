@@ -7,8 +7,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import de.disk0.dbutil.api.exceptions.SqlException;
 import de.disk0.dbutil.impl.hund.Hund;
@@ -41,7 +41,7 @@ public class InTest extends TestBase {
 		p.put("name", l);
 		
 		List<Hund> hs = hr.find("SELECT * FROM hund WHERE name IN ( :name )", p);
-		Assert.assertEquals(3,hs.size());
+		Assertions.assertEquals(3,hs.size());
 		
 		
 		

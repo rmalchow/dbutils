@@ -11,9 +11,9 @@ import java.util.Comparator;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.dbcp2.BasicDataSource;
-import org.junit.After;
-import org.junit.Before;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 
 public abstract class TestBase {
 
@@ -23,23 +23,11 @@ public abstract class TestBase {
 	
 	public abstract void setup(Connection c) throws Exception;
 	
-	@Before
+	@BeforeEach
 	public void prepare() throws Exception {
 		db = File.createTempFile("junit_", "");
 		
-		BasicDataSource bds =  new BasicDataSource();
-		try {
-			Class.forName("org.h2.Driver");
-			bds.setUrl("jdbc:h2:"+db.getAbsolutePath());
-			bds.setMaxIdle(5);
-			bds.setMaxTotal(50);
-			bds.getConnection().close();
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new IOException("error connecting to database");
-		}
-		
-		dataSource = bds;
+		dataSource = new SimpleDriverDataSource(new org.h2.Driver(), "jdbc:h2:" + db.getAbsolutePath());
 		Connection c = null;
 		try {
 			c = dataSource.getConnection();
@@ -55,7 +43,7 @@ public abstract class TestBase {
 		}
 	}
 
-	@After
+	@AfterEach
 	public void teardown() throws IOException {
 		Path rootPath = Paths.get(db.getAbsolutePath());
 		Files.walk(rootPath, FileVisitOption.FOLLOW_LINKS).sorted(Comparator.reverseOrder()).map(Path::toFile)

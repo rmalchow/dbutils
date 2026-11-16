@@ -2,8 +2,8 @@ package de.disk0.dbutil.impl.uuids;
 
 import java.sql.Connection;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import de.disk0.dbutil.api.exceptions.SqlException;
 import de.disk0.dbutil.impl.mysql.TestBase;
@@ -11,22 +11,18 @@ import de.disk0.dbutil.impl.pets.Pet;
 
 public class UuidTests extends TestBase {
 	
-	@Test(expected = SqlException.class)
+	@Test
 	public void checkBrokenUUIDGeneratorA() throws SqlException {
 		BrokenPetRepositoryA fr = new BrokenPetRepositoryA();
 		fr.setDataSource(dataSource);
-		Pet p = new Pet();
-		p = fr.save(p);
-		System.err.println(p.getId());
+		Assertions.assertThrows(SqlException.class, () -> fr.save(new Pet()));
 	}
 
-	@Test(expected = SqlException.class)
+	@Test
 	public void checkBrokenUUIDGeneratorB() throws SqlException {
 		BrokenPetRepositoryB fr = new BrokenPetRepositoryB();
 		fr.setDataSource(dataSource);
-		Pet p = new Pet();
-		p = fr.save(p);
-		System.err.println(p.getId());
+		Assertions.assertThrows(SqlException.class, () -> fr.save(new Pet()));
 	}
 
 	@Test
@@ -35,7 +31,7 @@ public class UuidTests extends TestBase {
 		fr.setDataSource(dataSource);
 		Pet p = new Pet();
 		p = fr.save(p);
-		Assert.assertEquals(36,p.getId().length());
+		Assertions.assertEquals(36,p.getId().length());
 	}
 
 	@Test
@@ -44,7 +40,7 @@ public class UuidTests extends TestBase {
 		fr.setDataSource(dataSource);
 		Pet p = new Pet();
 		p = fr.save(p);
-		Assert.assertEquals(16,p.getId().length());
+		Assertions.assertEquals(16,p.getId().length());
 	}
 
 	@Override

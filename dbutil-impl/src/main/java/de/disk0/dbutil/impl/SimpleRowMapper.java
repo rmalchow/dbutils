@@ -34,7 +34,7 @@ public class SimpleRowMapper<T> implements RowMapper<T> {
 	@Override
 	public T mapRow(ResultSet rs, int rowNum) throws SQLException {
 		try {
-			T out = clazz.newInstance();
+			T out = clazz.getDeclaredConstructor().newInstance();
 			for(ParsedColumn pc : getParsedEntity().getColumns()) {
 				try {
 					pc.set(out, rs);

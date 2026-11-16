@@ -3,8 +3,8 @@ package de.disk0.dbutil.impl.mysql;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import de.disk0.dbutil.api.exceptions.SqlException;
 import de.disk0.dbutil.impl.katze.Katze;
@@ -25,13 +25,13 @@ public class MapEnumTest extends TestBase {
 
 		Katze k = new Katze();
 		k = hr.save(k);
-		Assert.assertNotNull(k);
-		Assert.assertNotNull(k.getId());
-		Assert.assertNull(k.getType());
+		Assertions.assertNotNull(k);
+		Assertions.assertNotNull(k.getId());
+		Assertions.assertNull(k.getType());
 		
 		k.setType(TYPE.MIEZE);
 		k = hr.save(k);
-		Assert.assertEquals(TYPE.MIEZE, k.getType());
+		Assertions.assertEquals(TYPE.MIEZE, k.getType());
 		
 		
 		

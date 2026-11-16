@@ -1,7 +1,7 @@
 package de.disk0.dbutil.impl.mysql;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import de.disk0.dbutil.api.Aggregate;
 import de.disk0.dbutil.api.Comparator;
@@ -17,7 +17,7 @@ public class AggregateTest {
 		Select s = new MysqlStatementBuilder().createSelect();
 		TableReference t = s.fromTable("hund");
 		s.addSelect(Aggregate.AVG, t, "value", "hund");
-		Assert.assertEquals("SELECT avg(`hund_1`.`value`) AS `hund` FROM `hund` `hund_1`", s.getSql());
+		Assertions.assertEquals("SELECT avg(`hund_1`.`value`) AS `hund` FROM `hund` `hund_1`", s.getSql());
 		
 		s.condition(
 				Operator.OR,
@@ -26,8 +26,8 @@ public class AggregateTest {
 				t.field(Aggregate.CONCAT, t.field("path"), t.value("%"))
 			);
 
-		Assert.assertEquals("SELECT avg(`hund_1`.`value`) AS `hund` FROM `hund` `hund_1` WHERE `hund_1`.`hase` = concat(`hund_1`.`path`, :value_1)", s.getSql());
-		Assert.assertEquals("%", s.getParams().get("value_1"));
+		Assertions.assertEquals("SELECT avg(`hund_1`.`value`) AS `hund` FROM `hund` `hund_1` WHERE `hund_1`.`hase` = concat(`hund_1`.`path`, :value_1)", s.getSql());
+		Assertions.assertEquals("%", s.getParams().get("value_1"));
 		
 	}
 	

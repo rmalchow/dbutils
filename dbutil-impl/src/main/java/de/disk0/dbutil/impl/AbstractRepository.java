@@ -13,6 +13,7 @@ import de.disk0.dbutil.api.entities.BaseEntity;
 import de.disk0.dbutil.api.exceptions.SqlException;
 import de.disk0.dbutil.impl.util.ParsedEntity;
 import de.disk0.dbutil.impl.util.ParsedEntity.ParsedColumn;
+import de.disk0.dbutil.impl.util.SqlLog;
 
 
 public abstract class AbstractRepository<T extends BaseEntity<S>,S> extends AbstractMappingRepository<T> {
@@ -51,13 +52,14 @@ public abstract class AbstractRepository<T extends BaseEntity<S>,S> extends Abst
 		try {
 			NamedParameterJdbcTemplate t = getTemplate();
 			params.put("id", id);
+			SqlLog.values(getClazz().getSimpleName(), params);
 			List<T> ts = t.query(getFindOneStatement(), params, this);
 			if(ts.size()>0) {
 				return ts.get(0);
 			}
 			return null;
 		} catch (Exception e) {
-			log.warn("-------- query failed: "+sql+" / "+params);
+			log.warn("-------- query failed: "+sql+" params="+SqlLog.names(params));
 			throw new SqlException("SQL.REPO.LIST_FAILED",new Object[] { e.getMessage() },  e);
 		}
 	}
@@ -117,20 +119,21 @@ public abstract class AbstractRepository<T extends BaseEntity<S>,S> extends Abst
 	
 	public int delete(T t) throws SqlException {
 		String sql = "[none]";
+		Map<String,Object> params = new HashMap<>();
 		try {
 			if(t==null || t.getId()==null) {
 				return 0;
 			}
 			beforeDelete(t);
 			NamedParameterJdbcTemplate templ = getTemplate();
-			Map<String,Object> params = new HashMap<>();
 			params.put("id", t.getId());
 			sql = getDeleteOneStatement();
+			SqlLog.values(getClazz().getSimpleName(), params);
 			templ.update(sql, params);
 			afterDelete(t);
 			return 1;
 		} catch (Exception e) {
-			log.warn("delete failed: "+sql);
+			log.warn("delete failed: "+sql+" params="+SqlLog.names(params));
 			throw new SqlException("SQL.REPO.DELETE_FAILED",new Object[] { e.getMessage() },  e);
 		}
 	}
