@@ -55,7 +55,7 @@ public class SchemaCheckService {
 		}
 		
 		try {
-			String s = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT).writeValueAsString(tables);
+			String s = toJson(tables);
 			MessageDigest md = MessageDigest.getInstance("MD5");
 		    md.update(s.getBytes());
 		    byte[] digest = md.digest();
@@ -65,6 +65,11 @@ public class SchemaCheckService {
 			log.error("error checking db state: ",e);
 		}
 		
+	}
+
+	/** The JSON the logged schema hash is computed from. Pinned by SchemaCheckServiceTest: a change alters every hash. */
+	static String toJson(List<Table> tables) throws Exception {
+		return new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT).writeValueAsString(tables);
 	}
 
 	protected String encodeHex(final byte[] data) {

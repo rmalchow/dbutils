@@ -1,0 +1,21 @@
+[ {
+  "name" : "account",
+  "columns" : [ {
+    "field" : "id",
+    "type" : "varchar(64)",
+    "nullable" : "NO",
+    "key" : "PRI",
+    "defaultValue" : null
+  } ],
+  "keys" : [ {
+    "unique" : true,
+    "seqInIndex" : 1,
+    "table" : "account",
+    "keyname" : "PRIMARY",
+    "column" : "id"
+  } ]
+}, {
+  "name" : "range",
+  "columns" : [ null, null ],
+  "keys" : [ null ]
+} ]
