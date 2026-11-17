@@ -12,7 +12,7 @@
 	<artifactId>dbutil-impl</artifactId>
 
 	<properties>
-		<mariadb.test.version>3.5.8</mariadb.test.version>
+		<mariadb.test.version>3.5.11</mariadb.test.version>
 	</properties>
 
 	<dependencies>
