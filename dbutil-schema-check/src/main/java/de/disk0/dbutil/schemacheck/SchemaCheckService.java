@@ -18,8 +18,9 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
+import tools.jackson.databind.MapperFeature;
+import tools.jackson.databind.SerializationFeature;
+import tools.jackson.databind.json.JsonMapper;
 
 @Service
 public class SchemaCheckService {
@@ -69,7 +70,12 @@ public class SchemaCheckService {
 
 	/** The JSON the logged schema hash is computed from. Pinned by SchemaCheckServiceTest: a change alters every hash. */
 	static String toJson(List<Table> tables) throws Exception {
-		return new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT).writeValueAsString(tables);
+		// Jackson 3 sorts properties alphabetically by default; Jackson 2 (0.3.x) kept declaration order
+		return JsonMapper.builder()
+				.enable(SerializationFeature.INDENT_OUTPUT)
+				.disable(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY)
+				.build()
+				.writeValueAsString(tables);
 	}
 
 	protected String encodeHex(final byte[] data) {

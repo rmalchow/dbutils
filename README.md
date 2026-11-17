@@ -24,7 +24,7 @@ big thanks to everyone who has contributed to this, especially @mdjimy
 
 ### compatibility
 
-Spring Boot 3.5 and 4.0, Java 25 or later, `jakarta.persistence` only. [0.3.0 and later]
+Spring Boot 3.5 and 4.0, Java 25 or later, `jakarta.persistence` only. [0.3.0 and later; 0.4.0 moves the schema check to Jackson 3]
 
 if you are on older setups (Java 8 - 17, Spring Boot 2.x, `javax.persistence`), stay on 0.2.x. see "migrating from 0.2.x" below.
 
@@ -350,6 +350,14 @@ ObservationPredicate noDbutilObservations() {
 - the `dbutil.micrometer.enabled` property is gone; metrics now go through the observation api (see "metrics"). if you had it unset and don't want the metrics now, add the `ObservationPredicate`.
 - `ReaderConfig` is removed.
 - log format changed: the old two-line `VERY SLOW` output is now one line with timing, rows, entity and parameter names, and parameter values are no longer logged unless you enable `de.disk0.dbutil.sql.params`. check any alerts or log searches that match on the old text.
+
+
+
+### migrating from 0.3.x
+
+- `dbutil-schema-check` uses Jackson 3 (`tools.jackson.core:jackson-databind`) instead of Jackson 2. it no longer brings `com.fasterxml.jackson.core:jackson-databind` with it; if your application used Jackson 2 only through dbutils, declare it yourself.
+- the JSON the schema hash is computed from is unchanged, so the logged `DB state` hash stays the same.
+- `dbutil-api` and `dbutil-impl` never used Jackson, nothing changes there.
 
 
 
